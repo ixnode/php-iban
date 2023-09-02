@@ -15,6 +15,7 @@ namespace Ixnode\PhpIban;
 
 use Ixnode\PhpException\Parser\ParserException;
 use Ixnode\PhpIban\Exception\AccountParseException;
+use Ixnode\PhpTimezone\Constants\CountryEurope;
 
 /**
  * Class AccountNumber
@@ -169,36 +170,44 @@ final class Account
     }
 
     /**
-     * Returns the checksum of the account number and bank code.
+     * Returns the IBAN check digits of the account number and bank code.
      *
      * @return string
      * @throws AccountParseException
      */
-    public function getCheckDigits(): string
+    public function getIbanCheckDigits(): string
     {
-        $ibanRaw = match($this->countryCode) {
-            'AT', 'CH', 'DE', 'LI' => sprintf(
+        $checksum = intval(bcmod($this->getIbanRaw(), '97'));
+
+        return str_pad(strval(98 - $checksum), 2, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Returns the short IBAN without country code and IBAN check digits.
+     *
+     * @return string
+     * @throws AccountParseException
+     */
+    private function getIbanShort(): string
+    {
+        return match($this->countryCode) {
+            CountryEurope::COUNTRY_CODE_AT,
+            CountryEurope::COUNTRY_CODE_CH,
+            CountryEurope::COUNTRY_CODE_DE,
+            CountryEurope::COUNTRY_CODE_LI => sprintf(
+                '%s%s',
+                $this->getNationalBankCode(),
+                $this->getAccountNumber()
+            ),
+            CountryEurope::COUNTRY_CODE_FR => sprintf(
                 '%s%s%s%s',
                 $this->getNationalBankCode(),
-                $this->getAccountNumber(),
-                $this->calculateCodeNumber($this->getCountryCode()),
-                self::CHECKSUM_FAKE
-            ),
-            'FR' => sprintf(
-                '%s%s%s%s%s%s',
-                $this->getNationalBankCode(),
                 $this->getBranchCode(),
-                $this->calculateCodeNumber($this->getAccountNumber()),
-                $this->getNationalCheckDigits(),
-                $this->calculateCodeNumber($this->getCountryCode()),
-                self::CHECKSUM_FAKE
+                $this->getAccountNumber(),
+                $this->getNationalCheckDigits()
             ),
             default => throw new AccountParseException(sprintf('Country code "%s" is not supported.', $this->countryCode)),
         };
-
-        $checksum = intval(bcmod($ibanRaw, '97'));
-
-        return str_pad(strval(98 - $checksum), 2, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -209,23 +218,17 @@ final class Account
      */
     public function getIban(): string
     {
-        return match($this->countryCode) {
-            'AT', 'CH', 'DE', 'LI' => sprintf(
-                '%s%s%s%s',
-                $this->getCountryCode(),
-                $this->getCheckDigits(),
-                $this->getNationalBankCode(),
-                $this->getAccountNumber()
-            ),
-            'FR' => sprintf(
-                '%s%s%s%s%s',
-                $this->getCountryCode(),
-                $this->getCheckDigits(),
-                $this->getNationalBankCode(),
-                $this->getBranchCode(),
-                $this->getAccountNumber()
-            ),
-            default => throw new AccountParseException(sprintf('Country code "%s" is not supported.', $this->countryCode)),
-        };
+        return sprintf('%s%s%s', $this->getCountryCode(), $this->getIbanCheckDigits(), $this->getIbanShort());
+    }
+
+    /**
+     * Returns the raw iban code with fake checksum to calculate the IBAN check digits.
+     *
+     * @return string
+     * @throws AccountParseException
+     */
+    private function getIbanRaw(): string
+    {
+        return sprintf('%s%s%s', $this->calculateCodeNumber($this->getIbanShort()), $this->calculateCodeNumber($this->getCountryCode()), self::CHECKSUM_FAKE);
     }
 }

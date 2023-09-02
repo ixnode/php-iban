@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Ixnode\PhpIban\Constant;
 
+use Ixnode\PhpTimezone\Constants\CountryEurope;
+
 /**
  * Class IbanFormats
  *
@@ -27,7 +29,7 @@ final class IbanFormats
         'AD' => 'ADkk bbbb ssss cccc cccc cccc',
         'AE' => 'AEkk bbbc cccc cccc cccc ccc',
         'AL' => 'ALkk bbbs sssx cccc cccc cccc cccc',
-        'AT' => 'ATkk bbbb bccc cccc cccc',
+        CountryEurope::COUNTRY_CODE_AT => 'ATkk bbbb bccc cccc cccc',
         'AZ' => 'AZkk bbbb cccc cccc cccc cccc cccc',
         'BA' => 'BAkk bbbs sscc cccc ccxx',
         'BE' => 'BEkk bbbc cccc ccxx',
@@ -35,11 +37,11 @@ final class IbanFormats
         'BH' => 'BHkk bbbb cccc cccc cccc cc',
         'BR' => 'BRkk bbbb bbbb ssss sccc cccc ccct n',
         'BY' => 'BYkk bbbb aaaa cccc cccc cccc cccc',
-        'CH' => 'CHkk bbbb bccc cccc cccc c',
+        CountryEurope::COUNTRY_CODE_CH => 'CHkk bbbb bccc cccc cccc c',
         'CR' => 'CRkk 0bbb cccc cccc cccc cc',
         'CY' => 'CYkk bbbs ssss cccc cccc cccc cccc',
         'CZ' => 'CZkk bbbb pppp ppcc cccc cccc',
-        'DE' => 'DEkk bbbb bbbb cccc cccc cc',
+        CountryEurope::COUNTRY_CODE_DE => 'DEkk bbbb bbbb cccc cccc cc',
         'DK' => 'DKkk bbbb cccc cccc cx',
         'DO' => 'DOkk bbbb cccc cccc cccc cccc cccc',
         'EE' => 'EEkk bbss cccc cccc cccx',
@@ -47,7 +49,7 @@ final class IbanFormats
         'ES' => 'ESkk bbbb ssss xxcc cccc cccc',
         'FI' => 'FIkk bbbb bbcc cccc cx',
         'FO' => 'FOkk bbbb cccc cccc cx',
-        'FR' => 'FRkk bbbb bsss sscc cccc cccc cxx',
+        CountryEurope::COUNTRY_CODE_FR => 'FRkk bbbb bsss sscc cccc cccc cxx',
         'GB' => 'GBkk bbbb ssss sscc cccc cc',
         'GE' => 'GEkk bbcc cccc cccc cccc cc',
         'GI' => 'GIkk bbbb cccc cccc cccc ccc',
@@ -66,7 +68,7 @@ final class IbanFormats
         'KZ' => 'KZkk bbbc cccc cccc cccc',
         'LB' => 'LBkk bbbb cccc cccc cccc cccc cccc',
         'LC' => 'LCkk bbbb cccc cccc cccc cccc cccc cccc',
-        'LI' => 'LIkk bbbb bccc cccc cccc c',
+        CountryEurope::COUNTRY_CODE_LI => 'LIkk bbbb bccc cccc cccc c',
         'LT' => 'LTkk bbbb bccc cccc cccc',
         'LU' => 'LUkk bbbc cccc cccc cccc',
         'LV' => 'LVkk bbbb cccc cccc cccc c',

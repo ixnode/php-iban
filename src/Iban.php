@@ -96,6 +96,7 @@ final class Iban
     /**
      * @param string $iban
      * @throws IbanParseException
+     * @throws AccountParseException
      */
     public function __construct(private readonly string $iban)
     {
@@ -167,7 +168,7 @@ final class Iban
             Account::KEY_NATIONAL_CHECK_DIGITS => $this->nationalCheckDigits,
         ]);
 
-        if ($account->getCheckDigits() !== $this->ibanCheckDigits) {
+        if ($account->getIbanCheckDigits() !== $this->ibanCheckDigits) {
             $this->lastError = 'The checksum does not match.';
             $this->valid = false;
 
