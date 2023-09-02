@@ -15,6 +15,7 @@ namespace Ixnode\PhpIban;
 
 use Ixnode\PhpException\Case\CaseUnsupportedException;
 use Ixnode\PhpException\Type\TypeInvalidException;
+use Ixnode\PhpIban\Exception\AccountParseException;
 use Ixnode\PhpIban\Exception\IbanParseException;
 
 /**
@@ -28,15 +29,15 @@ class Validator
 {
     private Iban $iban;
 
-    private AccountNumber|null $accountNumber = null;
+    private Account|null $accountNumber = null;
 
     /**
-     * @param Iban|AccountNumber $given
+     * @param Iban|Account $given
      * @throws CaseUnsupportedException
      * @throws IbanParseException
-     * @throws TypeInvalidException
+     * @throws AccountParseException
      */
-    public function __construct(Iban|AccountNumber $given)
+    public function __construct(Iban|Account $given)
     {
         switch (true) {
             case $given instanceof Iban:
@@ -45,14 +46,25 @@ class Validator
                 $accountNumber = $given->getAccountNumber();
                 $bankCode = $given->getNationalBankCode();
                 $countryCode = $given->getCountryCode();
+                $branchCode = $given->getBranchCode();
+                $nationalCheckDigits = $given->getNationalCheckDigits();
 
                 $this->accountNumber = match (true) {
                     is_null($accountNumber), is_null($bankCode), is_null($countryCode) => null,
-                    default => new AccountNumber($accountNumber, $bankCode, $countryCode),
+                    default => new Account($accountNumber, $bankCode, $countryCode),
                 };
+
+                if (!is_null($this->accountNumber) && !is_null($branchCode)) {
+                    $this->accountNumber->setBranchCode($branchCode);
+                }
+
+                if (!is_null($this->accountNumber) && !is_null($nationalCheckDigits)) {
+                    $this->accountNumber->setNationalCheckDigits($nationalCheckDigits);
+                }
+
                 break;
 
-            case $given instanceof AccountNumber:
+            case $given instanceof Account:
                 $this->accountNumber = $given;
                 $this->iban = new Iban($this->accountNumber->getIban());
                 break;
@@ -74,6 +86,7 @@ class Validator
      * Returns the IBAN number.
      *
      * @return string
+     * @throws IbanParseException
      */
     public function getIban(): string
     {
@@ -149,5 +162,25 @@ class Validator
     public function getNationalBankCode(): string|null
     {
         return $this->accountNumber?->getNationalBankCode();
+    }
+
+    /**
+     * Returns the branch code.
+     *
+     * @return string|null
+     */
+    public function getBranchCode(): string|null
+    {
+        return $this->accountNumber?->getBranchCode();
+    }
+
+    /**
+     * Returns the national check digits.
+     *
+     * @return string|null
+     */
+    public function getNationalCheckDigits(): string|null
+    {
+        return $this->accountNumber?->getNationalCheckDigits();
     }
 }

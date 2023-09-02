@@ -16,7 +16,7 @@
 ## 1. Usage
 
 ```php
-use Ixnode\PhpIban\AccountNumber;
+use Ixnode\PhpIban\Account;
 use Ixnode\PhpIban\Iban;
 use Ixnode\PhpIban\Validator;
 ```
@@ -46,6 +46,9 @@ $validator = new Validator(new AccountNumber($accountNumber, $bankCode, $country
 
 print $validator->getIban();
 // (string) DE02120300000000202051
+
+print $validator->getIbanFormatted();
+// (string) DE02 1203 0000 0000 2020 51
 ```
 
 ## 2. Supported countries
@@ -53,6 +56,8 @@ print $validator->getIban();
 * AT
 * CH
 * DE
+* LI
+* FR
 
 See https://en.wikipedia.org/wiki/International_Bank_Account_Number#IBAN_formats_by_country to add more countries.
 

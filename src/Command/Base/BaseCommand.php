@@ -71,14 +71,16 @@ abstract class BaseCommand extends Command
         $this->writeln('');
         $this->writeln('Parsed IBAN');
         $this->writeln('-----------');
-        $this->writeln(sprintf('IBAN:              %s', $validator->getIban()));
-        $this->writeln(sprintf('IBAN (formatted):  %s', $validator->getIbanFormatted()));
-        $this->writeln(sprintf('Valid:             %s', $validator->isValid() ? 'YES' : 'NO'));
-        $this->writeln(sprintf('Last error:        %s', $validator->hasLastError() ? $validator->getLastError() : 'N/A'));
-        $this->writeln(sprintf('Country:           %s', $validator->getCountryCode()));
-        $this->writeln(sprintf('Checksum:          %s', $validator->getIbanCheckDigits()));
-        $this->writeln(sprintf('Account number:    %s', $validator->getAccountNumber()));
-        $this->writeln(sprintf('Bank number:       %s', $validator->getNationalBankCode()));
+        $this->writeln(sprintf('IBAN:                   %s', $validator->getIban()));
+        $this->writeln(sprintf('IBAN (formatted):       %s', $validator->getIbanFormatted()));
+        $this->writeln(sprintf('Valid:                  %s', $validator->isValid() ? 'YES' : 'NO'));
+        $this->writeln(sprintf('Last error:             %s', $validator->hasLastError() ? $validator->getLastError() : 'N/A'));
+        $this->writeln(sprintf('Country:                %s', $validator->getCountryCode()));
+        $this->writeln(sprintf('Checksum:               %s', $validator->getIbanCheckDigits()));
+        $this->writeln(sprintf('National bank code:     %s', $validator->getNationalBankCode()));
+        $this->writeln(sprintf('Branch code:            %s', $validator->getBranchCode() ?: 'N/A'));
+        $this->writeln(sprintf('Account number:         %s', $validator->getAccountNumber()));
+        $this->writeln(sprintf('National check digits:  %s', $validator->getNationalCheckDigits() ?: 'N/A'));
         $this->writeln('');
     }
 }

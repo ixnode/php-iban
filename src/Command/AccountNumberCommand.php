@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Ixnode\PhpIban\Command;
 
 use Exception;
-use Ixnode\PhpIban\AccountNumber;
+use Ixnode\PhpIban\Account;
 use Ixnode\PhpIban\Command\Base\BaseCommand;
 use Ixnode\PhpIban\Validator;
 
@@ -71,7 +71,7 @@ class AccountNumberCommand extends BaseCommand
             return self::INVALID;
         }
 
-        $validator = new Validator(new AccountNumber($accountNumber, $bankCode, $countryCode));
+        $validator = new Validator(new Account($accountNumber, $bankCode, $countryCode));
 
         $this->writeln('');
         $this->writeln(sprintf('Given account number: %s', $accountNumber));

@@ -16,13 +16,13 @@ namespace Ixnode\PhpIban\Exception;
 use Ixnode\PhpException\Base\BaseException;
 
 /**
- * Class AccountNumberParseException
+ * Class AccountParseException
  *
  * @author Björn Hempel <bjoern@hempel.li>
  * @version 0.1.0 (2023-09-01)
  * @since 0.1.0 (2023-09-01) First version.
  */
-final class AccountNumberParseException extends BaseException
+final class AccountParseException extends BaseException
 {
     public const TEXT_PLACEHOLDER = '%s';
 
