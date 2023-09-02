@@ -75,7 +75,7 @@ abstract class BaseCommand extends Command
         $this->writeln(sprintf('IBAN (formatted):       %s', $validator->getIbanFormatted()));
         $this->writeln(sprintf('Valid:                  %s', $validator->isValid() ? 'YES' : 'NO'));
         $this->writeln(sprintf('Last error:             %s', $validator->hasLastError() ? $validator->getLastError() : 'N/A'));
-        $this->writeln(sprintf('Country:                %s', $validator->getCountryCode()));
+        $this->writeln(sprintf('Country:                %s (%s)', $validator->getCountryCode(), $validator->getCountryName()));
         $this->writeln(sprintf('Checksum:               %s', $validator->getIbanCheckDigits()));
         $this->writeln(sprintf('National bank code:     %s', $validator->getNationalBankCode()));
         $this->writeln(sprintf('Branch code:            %s', $validator->getBranchCode() ?: 'N/A'));

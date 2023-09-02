@@ -17,6 +17,9 @@ use Ixnode\PhpException\Case\CaseUnsupportedException;
 use Ixnode\PhpException\Type\TypeInvalidException;
 use Ixnode\PhpIban\Exception\AccountParseException;
 use Ixnode\PhpIban\Exception\IbanParseException;
+use Ixnode\PhpIban\Exception\ValidatorParseException;
+use Ixnode\PhpTimezone\Constants\CountryAll;
+use Ixnode\PhpTimezone\Constants\Locale;
 
 /**
  * Class Validator
@@ -111,6 +114,34 @@ class Validator
     public function getCountryCode(): string|null
     {
         return $this->iban->getCountryCode();
+    }
+
+    /**
+     * Returns the country code of given IBAN number.
+     *
+     * @param string $languageCode
+     * @return string|null
+     * @throws ValidatorParseException
+     */
+    public function getCountryName(string $languageCode = Locale::EN_GB): string|null
+    {
+        $countryCode = $this->getCountryCode();
+
+        if (is_null($countryCode)) {
+            return null;
+        }
+
+        if (!array_key_exists($countryCode, CountryAll::COUNTRY_NAMES)) {
+            throw new ValidatorParseException(sprintf('The given country code "%s" is not supported.', $countryCode));
+        }
+
+        $countryNames = CountryAll::COUNTRY_NAMES[$countryCode];
+
+        if (!array_key_exists($languageCode, $countryNames)) {
+            throw new ValidatorParseException(sprintf('The given language code "%s" is not supported.', $languageCode));
+        }
+
+        return $countryNames[$languageCode];
     }
 
     /**

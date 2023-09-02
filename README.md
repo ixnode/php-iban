@@ -88,22 +88,25 @@ bin/console iban:validate DE02120300000000202051
 or within your composer project:
 
 ```bash
-vendor/bin/php-iban iban:validate DE02120300000000202051
+bin/console iban:validate FR7630027175330002005370159
 ```
 
 ```bash
 
-Given IBAN:     DE02120300000000202051
+Given IBAN:     FR7630027175330002005370159
 
 Parsed IBAN
 -----------
-IBAN:           DE02120300000000202051
-Valid:          YES
-Last error:     N/A
-Country:        DE
-Checksum:       02
-Account number: 0000202051
-Bank number:    12030000
+IBAN:                   FR7630027175330002005370159
+IBAN (formatted):       FR76 3002 7175 3300 0200 5370 159
+Valid:                  YES
+Last error:             N/A
+Country:                FR (France)
+Checksum:               76
+National bank code:     30027
+Branch code:            17533
+Account number:         00020053701
+National check digits:  59
 
 ```
 
