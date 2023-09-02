@@ -160,6 +160,38 @@ final class ValidatorTest extends TestCase
             ]],
 
             /**
+             * AD: Simple IBAN validator test (positive true tests).
+             *
+             * @see https://www.iban.de/iban-laenderliste.html
+             * @see https://de.iban.com/struktur
+             */
+            [++$number, new Iban('AD1400080001001234567890'), true, null, [
+                IbanFormat::KEY_COUNTRY_CODE => 'AD',
+                IbanFormat::KEY_IBAN_CHECK_DIGITS => '14',
+                IbanFormat::KEY_NATIONAL_BANK_CODE => '0008',
+                IbanFormat::KEY_ACCOUNT_NUMBER => '001234567890',
+                IbanFormat::KEY_BRANCH_CODE => '0001',
+                IbanFormat::KEY_NATIONAL_CHECK_DIGITS => null,
+                IbanFormat::KEY_IBAN_FORMATTED => 'AD14 0008 0001 0012 3456 7890',
+            ]],
+
+            /**
+             * AZ: Simple IBAN validator test (positive true tests).
+             *
+             * @see https://www.iban.de/iban-laenderliste.html
+             * @see https://de.iban.com/struktur
+             */
+            [++$number, new Iban('AZ96AZEJ00000000001234567890'), true, null, [
+                IbanFormat::KEY_COUNTRY_CODE => 'AZ',
+                IbanFormat::KEY_IBAN_CHECK_DIGITS => '96',
+                IbanFormat::KEY_NATIONAL_BANK_CODE => 'AZEJ',
+                IbanFormat::KEY_ACCOUNT_NUMBER => '00000000001234567890',
+                IbanFormat::KEY_BRANCH_CODE => null,
+                IbanFormat::KEY_NATIONAL_CHECK_DIGITS => null,
+                IbanFormat::KEY_IBAN_FORMATTED => 'AZ96 AZEJ 0000 0000 0012 3456 7890',
+            ]],
+
+            /**
              * ES: Simple IBAN validator test (positive true tests).
              *
              * @see https://www.iban.de/iban-laenderliste.html
