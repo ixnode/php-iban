@@ -43,7 +43,7 @@ class Validator
                 $this->iban = $given;
 
                 $accountNumber = $given->getAccountNumber();
-                $bankCode = $given->getBankCode();
+                $bankCode = $given->getNationalBankCode();
                 $countryCode = $given->getCountryCode();
 
                 $this->accountNumber = match (true) {
@@ -84,6 +84,7 @@ class Validator
      * Returns the formatted IBAN number.
      *
      * @return string
+     * @throws IbanParseException
      */
     public function getIbanFormatted(): string
     {
@@ -141,12 +142,12 @@ class Validator
     }
 
     /**
-     * Returns the bank code.
+     * Returns the national bank code.
      *
      * @return string|null
      */
-    public function getBankCode(): string|null
+    public function getNationalBankCode(): string|null
     {
-        return $this->accountNumber?->getBankCode();
+        return $this->accountNumber?->getNationalBankCode();
     }
 }

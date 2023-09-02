@@ -33,7 +33,7 @@ final class ValidatorTest extends TestCase
     /**
      * Test wrapper.
      *
-     * @dataProvider dataProvider
+     * @dataProvider dataProviderIban
      *
      * @test
      * @testdox $number) Test account number: "$accountNumber"
@@ -45,11 +45,12 @@ final class ValidatorTest extends TestCase
      * @param string|null $checksum
      * @param string|null $accountNumber
      * @param string|null $bankCode
+     * @param string|null $ibanFormatted
      * @throws CaseUnsupportedException
-     * @throws TypeInvalidException
      * @throws IbanParseException
+     * @throws TypeInvalidException
      */
-    public function wrapper(
+    public function wrapperIban(
         int $number,
         Iban $given,
         bool $valid,
@@ -57,7 +58,8 @@ final class ValidatorTest extends TestCase
         string|null $countryCode,
         string|null $checksum,
         string|null $accountNumber,
-        string|null $bankCode
+        string|null $bankCode,
+        string|null $ibanFormatted,
     ): void
     {
         /* Arrange */
@@ -72,7 +74,8 @@ final class ValidatorTest extends TestCase
         $this->assertSame($validator->getCountryCode(), $countryCode);
         $this->assertSame($validator->getIbanCheckDigits(), $checksum);
         $this->assertSame($validator->getAccountNumber(), $accountNumber);
-        $this->assertSame($validator->getBankCode(), $bankCode);
+        $this->assertSame($validator->getNationalBankCode(), $bankCode);
+        $this->assertSame($validator->getIbanFormatted(), $ibanFormatted);
     }
 
     /**
@@ -80,7 +83,7 @@ final class ValidatorTest extends TestCase
      *
      * @return array<int, array<int, mixed>>
      */
-    public function dataProvider(): array
+    public function dataProviderIban(): array
     {
         $number = 0;
 
@@ -89,26 +92,27 @@ final class ValidatorTest extends TestCase
             /**
              * Simple IBAN validator test (positive true tests).
              *
-             * @see https://ibanvalidieren.de/beispiele.html
+             * @see [AT,CH,DE,LI] https://ibanvalidieren.de/beispiele.html
              */
-            [++$number, new Iban('AT026000000001349870'), true, null, 'AT', '02', '00001349870', '60000'],
-            [++$number, new Iban('CH0209000000100013997'), true, null, 'CH', '02', '000100013997', '09000'],
-            [++$number, new Iban('DE02120300000000202051'), true, null, 'DE', '02', '0000202051', '12030000'],
+            [++$number, new Iban('AT026000000001349870'), true, null, 'AT', '02', '00001349870', '60000', 'AT02 6000 0000 0134 9870'],
+            [++$number, new Iban('CH0209000000100013997'), true, null, 'CH', '02', '000100013997', '09000', 'CH02 0900 0000 1000 1399 7'],
+            [++$number, new Iban('DE02120300000000202051'), true, null, 'DE', '02', '0000202051', '12030000', 'DE02 1203 0000 0000 2020 51'],
+            [++$number, new Iban('LI0208800000017197386'), true, null, 'LI', '02', '000017197386', '08800', 'LI02 0880 0000 0171 9738 6'],
 
             /**
              * Wrong checksum (positive false tests).
              */
-            [++$number, new Iban('DE03120300000000202051'), false, 'The checksum does not match.', 'DE', '03', '0000202051', '12030000'],
+            [++$number, new Iban('DE03120300000000202051'), false, 'The checksum does not match.', 'DE', '03', '0000202051', '12030000', 'DE03 1203 0000 0000 2020 51'],
 
             /**
              * Wrong length (positive false tests).
              */
-            [++$number, new Iban('DE0312030000000020205'), false, 'Invalid length of IBAN given: "DE0312030000000020205" (expected: "DEkkbbbbbbbbcccccccccc").', null, null, null, null],
+            [++$number, new Iban('DE0312030000000020205'), false, 'Invalid length of IBAN given: "DE0312030000000020205" (expected: "DEkkbbbbbbbbcccccccccc").', null, null, null, null, 'DE03 1203 0000 0000 2020 5'],
 
             /**
              * Wrong country (positive false tests).
              */
-            [++$number, new Iban('XX02120300000000202051'), false, 'The given country "XX" is not supported yet.', null, null, null, null],
+            [++$number, new Iban('XX02120300000000202051'), false, 'The given country "XX" is not supported yet.', null, null, null, null, 'XX02 1203 0000 0000 2020 51'],
 
         ];
     }

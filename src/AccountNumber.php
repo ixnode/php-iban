@@ -28,12 +28,12 @@ final readonly class AccountNumber
 
     /**
      * @param string $accountNumber
-     * @param string $bankCode
+     * @param string $nationalBankCode
      * @param string $countryCode
      */
     public function __construct(
         private string $accountNumber,
-        private string $bankCode,
+        private string $nationalBankCode,
         private string $countryCode
     )
     {
@@ -77,9 +77,9 @@ final readonly class AccountNumber
      *
      * @return string
      */
-    public function getBankCode(): string
+    public function getNationalBankCode(): string
     {
-        return $this->bankCode;
+        return $this->nationalBankCode;
     }
 
     /**
@@ -97,7 +97,7 @@ final readonly class AccountNumber
      */
     public function getChecksum(): string
     {
-        $ibanRaw = sprintf('%s%s%s%s', $this->getBankCode(), $this->getAccountNumber(), $this->getCountryCodeNumber($this->getCountryCode()), self::CHECKSUM_FAKE);
+        $ibanRaw = sprintf('%s%s%s%s', $this->getNationalBankCode(), $this->getAccountNumber(), $this->getCountryCodeNumber($this->getCountryCode()), self::CHECKSUM_FAKE);
 
         $checksum = intval(bcmod($ibanRaw, '97'));
 
@@ -115,7 +115,7 @@ final readonly class AccountNumber
             '%s%s%s%s',
             $this->getCountryCode(),
             $this->getChecksum(),
-            $this->getBankCode(),
+            $this->getNationalBankCode(),
             $this->getAccountNumber()
         );
     }
