@@ -95,7 +95,7 @@ final class ValidatorTest extends TestCase
             self::KEY_COUNTRY_CODE => $validator->getCountryCode(),
             self::KEY_IBAN_CHECK_DIGITS => $validator->getIbanCheckDigits(),
             self::KEY_NATIONAL_BANK_CODE => $validator->getNationalBankCode(),
-            self::KEY_ACCOUNT_NUMBER => $validator->getAccountNumber(),
+            self::KEY_ACCOUNT_NUMBER => $validator->getAccount(),
             self::KEY_BRANCH_CODE => $validator->getBranchCode(),
             self::KEY_NATIONAL_CHECK_DIGITS => $validator->getNationalCheckDigits(),
             self::KEY_IBAN_FORMATTED => $validator->getIbanFormatted(),

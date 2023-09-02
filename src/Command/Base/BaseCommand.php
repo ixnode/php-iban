@@ -79,7 +79,7 @@ abstract class BaseCommand extends Command
         $this->writeln(sprintf('Checksum:               %s', $validator->getIbanCheckDigits()));
         $this->writeln(sprintf('National bank code:     %s', $validator->getNationalBankCode()));
         $this->writeln(sprintf('Branch code:            %s', $validator->getBranchCode() ?: 'N/A'));
-        $this->writeln(sprintf('Account number:         %s', $validator->getAccountNumber()));
+        $this->writeln(sprintf('Account number:         %s', $validator->getAccount()));
         $this->writeln(sprintf('National check digits:  %s', $validator->getNationalCheckDigits() ?: 'N/A'));
         $this->writeln('');
     }

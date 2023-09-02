@@ -140,7 +140,6 @@ final class Iban
 
         if (strlen($iban) !== strlen($ibanFormat)) {
             $this->lastError = sprintf('Invalid length of IBAN given: "%s" (expected: "%s").', $iban, $ibanFormat);
-            $this->lastError = sprintf('Invalid length of IBAN given: "%s" (expected: "%s").', $iban, $ibanFormat);
             $this->valid = false;
 
             return false;
@@ -161,17 +160,14 @@ final class Iban
             throw new IbanParseException(sprintf('No national bank code was found in the given IBAN "%s".', $iban));
         }
 
-        $accountNumber = new Account($this->accountNumber, $this->nationalBankCode, $this->countryCode);
+        $account = new Account($this->accountNumber, $this->nationalBankCode, $this->countryCode);
 
-        if (!is_null($this->branchCode)) {
-            $accountNumber->setBranchCode($this->branchCode);
-        }
+        $account->setProperties([
+            Account::KEY_BRANCH_CODE => $this->branchCode,
+            Account::KEY_NATIONAL_CHECK_DIGITS => $this->nationalCheckDigits,
+        ]);
 
-        if (!is_null($this->nationalCheckDigits)) {
-            $accountNumber->setNationalCheckDigits($this->nationalCheckDigits);
-        }
-
-        if ($accountNumber->getCheckDigits() !== $this->ibanCheckDigits) {
+        if ($account->getCheckDigits() !== $this->ibanCheckDigits) {
             $this->lastError = 'The checksum does not match.';
             $this->valid = false;
 

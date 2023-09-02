@@ -17,6 +17,7 @@ use Exception;
 use Ixnode\PhpIban\Account;
 use Ixnode\PhpIban\Command\Base\BaseCommand;
 use Ixnode\PhpIban\Validator;
+use Ixnode\PhpTimezone\Constants\CountryEurope;
 
 /**
  * Class AccountNumberCommand
@@ -68,6 +69,16 @@ class AccountNumberCommand extends BaseCommand
 
         if (is_null($countryCode)) {
             $this->printError('No country code given.');
+            return self::INVALID;
+        }
+
+        if (!in_array($countryCode, [
+            CountryEurope::COUNTRY_CODE_AT,
+            CountryEurope::COUNTRY_CODE_CH,
+            CountryEurope::COUNTRY_CODE_DE,
+            CountryEurope::COUNTRY_CODE_LI,
+        ])) {
+            $this->printError(sprintf('The given country code "%s" is not supported.', $countryCode));
             return self::INVALID;
         }
 

@@ -31,6 +31,10 @@ final class Account
 
     private string|null $nationalCheckDigits = null;
 
+    final public const KEY_BRANCH_CODE = 'branch-code';
+
+    final public const KEY_NATIONAL_CHECK_DIGITS = 'national-check-digits';
+
     /**
      * @param string $accountNumber
      * @param string $nationalBankCode
@@ -136,6 +140,30 @@ final class Account
     public function setNationalCheckDigits(?string $nationalCheckDigits): self
     {
         $this->nationalCheckDigits = $nationalCheckDigits;
+
+        return $this;
+    }
+
+    /**
+     * Sets some properties.
+     *
+     * @param array<string, mixed> $properties
+     * @return $this
+     * @throws AccountParseException
+     */
+    public function setProperties(array $properties): self
+    {
+        foreach ($properties as $property => $value) {
+            if (!is_null($value) && !is_string($value)) {
+                throw new AccountParseException(sprintf('Property "%s" must be a string or null.', $property));
+            }
+
+            match ($property) {
+                self::KEY_BRANCH_CODE => $this->setBranchCode($value),
+                self::KEY_NATIONAL_CHECK_DIGITS => $this->setNationalCheckDigits($value),
+                default => throw new AccountParseException(sprintf('Unknown property "%s" given.', $property)),
+            };
+        }
 
         return $this;
     }

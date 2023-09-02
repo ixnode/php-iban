@@ -29,7 +29,7 @@ class Validator
 {
     private Iban $iban;
 
-    private Account|null $accountNumber = null;
+    private Account|null $account = null;
 
     /**
      * @param Iban|Account $given
@@ -49,24 +49,23 @@ class Validator
                 $branchCode = $given->getBranchCode();
                 $nationalCheckDigits = $given->getNationalCheckDigits();
 
-                $this->accountNumber = match (true) {
-                    is_null($accountNumber), is_null($bankCode), is_null($countryCode) => null,
-                    default => new Account($accountNumber, $bankCode, $countryCode),
-                };
-
-                if (!is_null($this->accountNumber) && !is_null($branchCode)) {
-                    $this->accountNumber->setBranchCode($branchCode);
+                if (is_null($accountNumber) || is_null($bankCode) || is_null($countryCode)) {
+                    $this->account = null;
+                    break;
                 }
 
-                if (!is_null($this->accountNumber) && !is_null($nationalCheckDigits)) {
-                    $this->accountNumber->setNationalCheckDigits($nationalCheckDigits);
-                }
+                $this->account = new Account($accountNumber, $bankCode, $countryCode);
+
+                $this->account->setProperties([
+                    Account::KEY_BRANCH_CODE => $branchCode,
+                    Account::KEY_NATIONAL_CHECK_DIGITS => $nationalCheckDigits,
+                ]);
 
                 break;
 
             case $given instanceof Account:
-                $this->accountNumber = $given;
-                $this->iban = new Iban($this->accountNumber->getIban());
+                $this->account = $given;
+                $this->iban = new Iban($this->account->getIban());
                 break;
 
             default:
@@ -149,9 +148,9 @@ class Validator
      *
      * @return string|null
      */
-    public function getAccountNumber(): string|null
+    public function getAccount(): string|null
     {
-        return $this->accountNumber?->getAccountNumber();
+        return $this->account?->getAccountNumber();
     }
 
     /**
@@ -161,7 +160,7 @@ class Validator
      */
     public function getNationalBankCode(): string|null
     {
-        return $this->accountNumber?->getNationalBankCode();
+        return $this->account?->getNationalBankCode();
     }
 
     /**
@@ -171,7 +170,7 @@ class Validator
      */
     public function getBranchCode(): string|null
     {
-        return $this->accountNumber?->getBranchCode();
+        return $this->account?->getBranchCode();
     }
 
     /**
@@ -181,6 +180,6 @@ class Validator
      */
     public function getNationalCheckDigits(): string|null
     {
-        return $this->accountNumber?->getNationalCheckDigits();
+        return $this->account?->getNationalCheckDigits();
     }
 }
