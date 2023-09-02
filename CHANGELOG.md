@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.1.8] - 2023-09-02
+
+* Add IBAN validator spain
+
 ### [0.1.7] - 2023-09-02
 
 * README.md updates
