@@ -59,6 +59,7 @@ print $validator->getIbanFormatted();
 * ES (Spain)
 * FR (France)
 * LI (Liechtenstein)
+* PT (Portugal)
 
 See https://en.wikipedia.org/wiki/International_Bank_Account_Number#IBAN_formats_by_country to add more countries.
 

@@ -13,9 +13,11 @@ declare(strict_types=1);
 
 namespace Ixnode\PhpIban;
 
-use Ixnode\PhpException\Parser\ParserException;
 use Ixnode\PhpIban\Exception\AccountParseException;
-use Ixnode\PhpTimezone\Constants\CountryEurope;
+use Ixnode\PhpIban\Exception\IbanParseException;
+use Ixnode\PhpIban\Exception\ValidatorParseException;
+use Ixnode\PhpTimezone\Constants\CountryAll;
+use Ixnode\PhpTimezone\Constants\Locale;
 
 /**
  * Class AccountNumber
@@ -26,57 +28,67 @@ use Ixnode\PhpTimezone\Constants\CountryEurope;
  */
 final class Account
 {
-    protected const CHECKSUM_FAKE = '00';
-
     private string|null $branchCode = null;
 
     private string|null $nationalCheckDigits = null;
-
-    final public const KEY_BRANCH_CODE = 'branch-code';
-
-    final public const KEY_NATIONAL_CHECK_DIGITS = 'national-check-digits';
 
     /**
      * @param string $accountNumber
      * @param string $nationalBankCode
      * @param string $countryCode
+     * @param array<string, mixed> $properties
+     * @throws AccountParseException
+     * @throws IbanParseException
      */
     public function __construct(
         private readonly string $accountNumber,
         private readonly string $nationalBankCode,
-        private readonly string $countryCode
+        private readonly string $countryCode,
+        array $properties = []
     )
     {
+        $this->setProperties($properties);
     }
 
     /**
-     * Returns the country abbreviation translate string.
+     * Sets some properties.
      *
-     * - DE: 1314
-     * - etc.
-     *
-     * @param string $value
-     * @return string
+     * @param array<string, mixed> $givenProperties
+     * @return $this
+     * @throws AccountParseException
+     * @throws IbanParseException
      */
-    private function calculateCodeNumber(string $value): string
+    public function setProperties(array $givenProperties): self
     {
-        $countryCodeNumber = '';
+        $expectedProperties = (new IbanFormat($this->countryCode))->getIbanFormatPropertyKeys([
+            IbanFormat::KEY_NATIONAL_BANK_CODE,
+            IbanFormat::KEY_ACCOUNT_NUMBER,
+        ]);
 
-        $alphabet = 'abcdefghijklmnopqrstuvwxyz';
-        $valueExplode = str_split(strtolower($value));
+        $unknownProperties = array_diff(array_keys($givenProperties), $expectedProperties);
+        $missingProperties = array_diff($expectedProperties, array_keys($givenProperties));
 
-        foreach ($valueExplode as $check) {
-            $position = strpos($alphabet, $check);
-
-            if ($position === false) {
-                $countryCodeNumber .= $check;
-                continue;
-            }
-
-            $countryCodeNumber .= strpos($alphabet, $check) + 10;
+        if (count($missingProperties) > 0) {
+            throw new AccountParseException(sprintf('Missing properties: %s', implode(', ', $missingProperties)));
         }
 
-        return $countryCodeNumber;
+        if (count($unknownProperties) > 0) {
+            throw new AccountParseException(sprintf('Unknown properties: %s', implode(', ', $unknownProperties)));
+        }
+
+        foreach ($givenProperties as $property => $value) {
+            if (!is_null($value) && !is_string($value)) {
+                throw new AccountParseException(sprintf('Property "%s" must be a string or null.', $property));
+            }
+
+            match ($property) {
+                IbanFormat::KEY_BRANCH_CODE => $this->setBranchCode($value),
+                IbanFormat::KEY_NATIONAL_CHECK_DIGITS => $this->setNationalCheckDigits($value),
+                default => throw new AccountParseException(sprintf('Unknown property "%s" given.', $property)),
+            };
+        }
+
+        return $this;
     }
 
     /**
@@ -105,6 +117,28 @@ final class Account
     public function getCountryCode(): string
     {
         return $this->countryCode;
+    }
+
+    /**
+     * Returns the country name of the IBAN.
+     *
+     * @param string $languageCode
+     * @return string|null
+     * @throws ValidatorParseException
+     */
+    public function getCountryName(string $languageCode = Locale::EN_GB): string|null
+    {
+        if (!array_key_exists($this->countryCode, CountryAll::COUNTRY_NAMES)) {
+            throw new ValidatorParseException(sprintf('The given country code "%s" is not supported.', $this->countryCode));
+        }
+
+        $countryNames = CountryAll::COUNTRY_NAMES[$this->countryCode];
+
+        if (!array_key_exists($languageCode, $countryNames)) {
+            throw new ValidatorParseException(sprintf('The given language code "%s" is not supported.', $languageCode));
+        }
+
+        return $countryNames[$languageCode];
     }
 
     /**
@@ -146,34 +180,11 @@ final class Account
     }
 
     /**
-     * Sets some properties.
-     *
-     * @param array<string, mixed> $properties
-     * @return $this
-     * @throws AccountParseException
-     */
-    public function setProperties(array $properties): self
-    {
-        foreach ($properties as $property => $value) {
-            if (!is_null($value) && !is_string($value)) {
-                throw new AccountParseException(sprintf('Property "%s" must be a string or null.', $property));
-            }
-
-            match ($property) {
-                self::KEY_BRANCH_CODE => $this->setBranchCode($value),
-                self::KEY_NATIONAL_CHECK_DIGITS => $this->setNationalCheckDigits($value),
-                default => throw new AccountParseException(sprintf('Unknown property "%s" given.', $property)),
-            };
-        }
-
-        return $this;
-    }
-
-    /**
      * Returns the IBAN check digits of the account number and bank code.
      *
      * @return string
      * @throws AccountParseException
+     * @throws IbanParseException
      */
     public function getIbanCheckDigits(): string
     {
@@ -183,49 +194,27 @@ final class Account
     }
 
     /**
-     * Returns the short IBAN without country code and IBAN check digits.
-     *
-     * @return string
-     * @throws AccountParseException
-     */
-    private function getIbanShort(): string
-    {
-        return match($this->countryCode) {
-            CountryEurope::COUNTRY_CODE_AT,
-            CountryEurope::COUNTRY_CODE_CH,
-            CountryEurope::COUNTRY_CODE_DE,
-            CountryEurope::COUNTRY_CODE_LI => sprintf(
-                '%s%s',
-                $this->getNationalBankCode(),
-                $this->getAccountNumber()
-            ),
-            CountryEurope::COUNTRY_CODE_FR => sprintf(
-                '%s%s%s%s',
-                $this->getNationalBankCode(),
-                $this->getBranchCode(),
-                $this->getAccountNumber(),
-                $this->getNationalCheckDigits()
-            ),
-            CountryEurope::COUNTRY_CODE_ES => sprintf(
-                '%s%s%s%s',
-                $this->getNationalBankCode(),
-                $this->getBranchCode(),
-                $this->getNationalCheckDigits(),
-                $this->getAccountNumber()
-            ),
-            default => throw new AccountParseException(sprintf('Country code "%s" is not supported.', $this->countryCode)),
-        };
-    }
-
-    /**
      * Returns the calculated iban number.
      *
      * @return string
      * @throws AccountParseException
+     * @throws IbanParseException
      */
     public function getIban(): string
     {
-        return sprintf('%s%s%s', $this->getCountryCode(), $this->getIbanCheckDigits(), $this->getIbanShort());
+        return (new IbanFormat($this->countryCode))->getIban($this);
+    }
+
+    /**
+     * Returns the formatted IBAN number.
+     *
+     * @return string
+     * @throws AccountParseException
+     * @throws IbanParseException
+     */
+    public function getIbanFormatted(): string
+    {
+        return trim(chunk_split($this->getIban(), 4, ' '));
     }
 
     /**
@@ -233,9 +222,10 @@ final class Account
      *
      * @return string
      * @throws AccountParseException
+     * @throws IbanParseException
      */
     private function getIbanRaw(): string
     {
-        return sprintf('%s%s%s', $this->calculateCodeNumber($this->getIbanShort()), $this->calculateCodeNumber($this->getCountryCode()), self::CHECKSUM_FAKE);
+        return (new IbanFormat($this->countryCode))->getIbanRaw($this);
     }
 }

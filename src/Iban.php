@@ -23,58 +23,16 @@ use Ixnode\PhpIban\Exception\IbanParseException;
  * @author Björn Hempel <bjoern@hempel.li>
  * @version 0.1.0 (2023-09-01)
  * @since 0.1.0 (2023-09-01) First version.
+ * @SuppressWarnings(PHPMD.LongVariable)
  */
 final class Iban
 {
-    /* Balance account number */
-    /** @phpstan-ignore-next-line */
-    private const BALANCE_ACCOUNT_NUMBER = 'a';
-
-    /* National bank code */
-    private const NATIONAL_BANK_CODE = 'b';
-
-    /* Account number */
-    private const ACCOUNT_NUMBER = 'c';
-
-    /* National identification number */
-    /** @phpstan-ignore-next-line */
-    private const NATIONAL_IDENTIFICATION_NUMBER = 'i';
-
-    /* IBAN check digits */
-    private const IBAN_CHECK_DIGITS = 'k';
-
-    /* Currency code */
-    /** @phpstan-ignore-next-line */
-    private const CURRENCY_CODE = 'm';
-
-    /* Owner account number */
-    /** @phpstan-ignore-next-line */
-    private const OWNER_ACCOUNT_NUMBER = 'n';
-
-    /* BIC bank code */
-    /** @phpstan-ignore-next-line */
-    private const BIC_BANK_CODE = 'q';
-
-    /* Branch code */
-    private const BRANCH_CODE = 's';
-
-    /* Account type */
-    /** @phpstan-ignore-next-line */
-    private const ACCOUNT_TYPE = 't';
-
-    /* National check digits */
-    private const NATIONAL_CHECK_DIGITS = 'x';
-
-    /* Always zero */
-    /** @phpstan-ignore-next-line */
-    private const ALWAYS_ZERO = '0';
-
     private const SUPPORTED_CODES = [
-        self::NATIONAL_BANK_CODE,
-        self::BRANCH_CODE,
-        self::ACCOUNT_NUMBER,
-        self::IBAN_CHECK_DIGITS,
-        self::NATIONAL_CHECK_DIGITS,
+        IbanFormat::CODE_NATIONAL_BANK_CODE,
+        IbanFormat::CODE_BRANCH_CODE,
+        IbanFormat::CODE_ACCOUNT_NUMBER,
+        IbanFormat::CODE_IBAN_CHECK_DIGITS,
+        IbanFormat::CODE_NATIONAL_CHECK_DIGITS,
     ];
 
     private string|null $lastError = null;
@@ -83,13 +41,26 @@ final class Iban
 
     private string|null $countryCode = null;
 
-    private string|null $ibanCheckDigits = null;
+
+    private string|null $balanceAccountNumber = null;
 
     private string|null $nationalBankCode = null;
 
+    private string|null $accountNumber = null;
+
+    private string|null $nationalIdentificationNumber = null;
+
+    private string|null $ibanCheckDigits = null;
+
+    private string|null $currencyCode = null;
+
+    private string|null $ownerAccountNumber = null;
+
+    private string|null $bicBankCode = null;
+
     private string|null $branchCode = null;
 
-    private string|null $accountNumber = null;
+    private string|null $accountType = null;
 
     private string|null $nationalCheckDigits = null;
 
@@ -116,6 +87,7 @@ final class Iban
      * @throws AccountParseException
      * @throws IbanParseException
      * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     private function parseIban(): bool
     {
@@ -147,11 +119,23 @@ final class Iban
         }
 
         $this->countryCode = $countryCode;
-        $this->ibanCheckDigits = $this->extractInformation($countryCode, self::IBAN_CHECK_DIGITS);
-        $this->nationalBankCode = $this->extractInformation($countryCode, self::NATIONAL_BANK_CODE);
-        $this->branchCode = $this->extractInformation($countryCode, self::BRANCH_CODE);
-        $this->accountNumber = $this->extractInformation($countryCode, self::ACCOUNT_NUMBER);
-        $this->nationalCheckDigits = $this->extractInformation($countryCode, self::NATIONAL_CHECK_DIGITS);
+
+        foreach ((new IbanFormat($countryCode))->getIbanFormatCodes() as $format) {
+            match ($format) {
+                IbanFormat::CODE_BALANCE_ACCOUNT_NUMBER => $this->balanceAccountNumber = $this->extractInformation($countryCode, IbanFormat::CODE_BALANCE_ACCOUNT_NUMBER),
+                IbanFormat::CODE_NATIONAL_BANK_CODE => $this->nationalBankCode = $this->extractInformation($countryCode, IbanFormat::CODE_NATIONAL_BANK_CODE),
+                IbanFormat::CODE_ACCOUNT_NUMBER => $this->accountNumber = $this->extractInformation($countryCode, IbanFormat::CODE_ACCOUNT_NUMBER),
+                IbanFormat::CODE_NATIONAL_IDENTIFICATION_NUMBER => $this->nationalIdentificationNumber = $this->extractInformation($countryCode, IbanFormat::CODE_NATIONAL_IDENTIFICATION_NUMBER),
+                IbanFormat::CODE_IBAN_CHECK_DIGITS => $this->ibanCheckDigits = $this->extractInformation($countryCode, IbanFormat::CODE_IBAN_CHECK_DIGITS),
+                IbanFormat::CODE_CURRENCY_CODE => $this->currencyCode = $this->extractInformation($countryCode, IbanFormat::CODE_CURRENCY_CODE),
+                IbanFormat::CODE_OWNER_ACCOUNT_NUMBER => $this->ownerAccountNumber = $this->extractInformation($countryCode, IbanFormat::CODE_OWNER_ACCOUNT_NUMBER),
+                IbanFormat::CODE_BIC_BANK_CODE => $this->bicBankCode = $this->extractInformation($countryCode, IbanFormat::CODE_BIC_BANK_CODE),
+                IbanFormat::CODE_BRANCH_CODE => $this->branchCode = $this->extractInformation($countryCode, IbanFormat::CODE_BRANCH_CODE),
+                IbanFormat::CODE_ACCOUNT_TYPE => $this->accountType = $this->extractInformation($countryCode, IbanFormat::CODE_ACCOUNT_TYPE),
+                IbanFormat::CODE_NATIONAL_CHECK_DIGITS => $this->nationalCheckDigits = $this->extractInformation($countryCode, IbanFormat::CODE_NATIONAL_CHECK_DIGITS),
+                default => throw new IbanParseException(sprintf('The given format "%s" is not supported yet.', $format)),
+            };
+        }
 
         if (is_null($this->accountNumber)) {
             throw new IbanParseException(sprintf('No account number was found in the given IBAN "%s".', $iban));
@@ -161,12 +145,17 @@ final class Iban
             throw new IbanParseException(sprintf('No national bank code was found in the given IBAN "%s".', $iban));
         }
 
-        $account = new Account($this->accountNumber, $this->nationalBankCode, $this->countryCode);
+        $properties = [];
 
-        $account->setProperties([
-            Account::KEY_BRANCH_CODE => $this->branchCode,
-            Account::KEY_NATIONAL_CHECK_DIGITS => $this->nationalCheckDigits,
-        ]);
+        if (!is_null($this->branchCode)) {
+            $properties[IbanFormat::KEY_BRANCH_CODE] = $this->branchCode;
+        }
+
+        if (!is_null($this->nationalCheckDigits)) {
+            $properties[IbanFormat::KEY_NATIONAL_CHECK_DIGITS] = $this->nationalCheckDigits;
+        }
+
+        $account = new Account($this->accountNumber, $this->nationalBankCode, $this->countryCode, $properties);
 
         if ($account->getIbanCheckDigits() !== $this->ibanCheckDigits) {
             $this->lastError = 'The checksum does not match.';
@@ -255,60 +244,16 @@ final class Iban
      * Returns the iban.
      *
      * @return string
-     * @throws IbanParseException
      */
     public function getIban(): string
     {
-        if (!$this->valid) {
-            return $this->iban;
-        }
-
-        if (is_null($this->countryCode)) {
-            return $this->iban;
-        }
-
-        $ibanFormat = $this->getIbanFormat($this->countryCode);
-
-        if ($this->checkIbanFormat($ibanFormat)) {
-            throw new IbanParseException(sprintf('The given country "%s" is not supported yet.', $this->countryCode));
-        }
-
-        foreach (self::SUPPORTED_CODES as $supportedCode) {
-            $count = substr_count($ibanFormat, $supportedCode);
-
-            if ($count <= 0) {
-                continue;
-            }
-
-            $value = match ($supportedCode) {
-                self::IBAN_CHECK_DIGITS => $this->getIbanCheckDigits(),
-                self::NATIONAL_BANK_CODE => $this->getNationalBankCode(),
-                self::ACCOUNT_NUMBER => $this->getAccountNumber(),
-                self::BRANCH_CODE => $this->getBranchCode(),
-                self::NATIONAL_CHECK_DIGITS => $this->getNationalCheckDigits(),
-            };
-
-            if (is_null($value)) {
-                throw new IbanParseException(sprintf('The given IBAN "%s" is invalid.', $this->iban));
-            }
-
-            if (strlen($value) > $count) {
-                throw new IbanParseException(sprintf('The given checksum "%s" is too long.', $value));
-            }
-
-            $value = str_pad($value, $count, '0', STR_PAD_LEFT);
-
-            $ibanFormat = str_replace(str_repeat($supportedCode, $count), $value, $ibanFormat);
-        }
-
-        return $ibanFormat;
+        return $this->iban;
     }
 
     /**
      * Returns the formatted IBAN number.
      *
      * @return string
-     * @throws IbanParseException
      */
     public function getIbanFormatted(): string
     {
@@ -346,38 +291,78 @@ final class Iban
     }
 
     /**
-     * Returns the country code of the iban.
-     *
      * @return string|null
      */
-    public function getCountryCode(): string|null
+    public function getCountryCode(): ?string
     {
         return $this->countryCode;
     }
 
     /**
-     * Returns the IBAN check digits of the IBAN.
-     *
      * @return string|null
      */
-    public function getIbanCheckDigits(): string|null
+    public function getBalanceAccountNumber(): ?string
     {
-        return $this->ibanCheckDigits;
+        return $this->balanceAccountNumber;
     }
 
     /**
-     * Returns the national bank code of the IBAN.
-     *
      * @return string|null
      */
-    public function getNationalBankCode(): string|null
+    public function getNationalBankCode(): ?string
     {
         return $this->nationalBankCode;
     }
 
     /**
-     * Returns the branch code of the IBAN.
-     *
+     * @return string|null
+     */
+    public function getAccountNumber(): ?string
+    {
+        return $this->accountNumber;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getNationalIdentificationNumber(): ?string
+    {
+        return $this->nationalIdentificationNumber;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getIbanCheckDigits(): ?string
+    {
+        return $this->ibanCheckDigits;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getCurrencyCode(): ?string
+    {
+        return $this->currencyCode;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getOwnerAccountNumber(): ?string
+    {
+        return $this->ownerAccountNumber;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getBicBankCode(): ?string
+    {
+        return $this->bicBankCode;
+    }
+
+    /**
      * @return string|null
      */
     public function getBranchCode(): ?string
@@ -386,18 +371,14 @@ final class Iban
     }
 
     /**
-     * Returns the account number of the IBAN.
-     *
      * @return string|null
      */
-    public function getAccountNumber(): string|null
+    public function getAccountType(): ?string
     {
-        return $this->accountNumber;
+        return $this->accountType;
     }
 
     /**
-     * Returns the national check digits of the IBAN.
-     *
      * @return string|null
      */
     public function getNationalCheckDigits(): ?string

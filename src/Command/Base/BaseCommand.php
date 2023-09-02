@@ -65,22 +65,34 @@ abstract class BaseCommand extends Command
      * @param Validator $validator
      * @return void
      * @throws Exception
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     protected function printIban(Validator $validator): void
     {
+        $iban = $validator->getIban();
+        $account = $validator->getAccount();
+
         $this->writeln('');
         $this->writeln('Parsed IBAN');
         $this->writeln('-----------');
-        $this->writeln(sprintf('IBAN:                   %s', $validator->getIban()));
-        $this->writeln(sprintf('IBAN (formatted):       %s', $validator->getIbanFormatted()));
         $this->writeln(sprintf('Valid:                  %s', $validator->isValid() ? 'YES' : 'NO'));
         $this->writeln(sprintf('Last error:             %s', $validator->hasLastError() ? $validator->getLastError() : 'N/A'));
-        $this->writeln(sprintf('Country:                %s (%s)', $validator->getCountryCode(), $validator->getCountryName()));
-        $this->writeln(sprintf('Checksum:               %s', $validator->getIbanCheckDigits()));
-        $this->writeln(sprintf('National bank code:     %s', $validator->getNationalBankCode()));
-        $this->writeln(sprintf('Branch code:            %s', $validator->getBranchCode() ?: 'N/A'));
-        $this->writeln(sprintf('Account number:         %s', $validator->getAccount()));
-        $this->writeln(sprintf('National check digits:  %s', $validator->getNationalCheckDigits() ?: 'N/A'));
+        $this->writeln(sprintf('IBAN:                   %s', $iban->getIban()));
+        $this->writeln(sprintf('IBAN:                   %s', $iban->getIbanFormatted()));
+        $this->writeln(sprintf('Checksum:               %s', $iban->getIbanCheckDigits()));
+
+        $this->writeln('');
+        $this->writeln('Account');
+        $this->writeln('-------');
+        $this->writeln(sprintf('Country:                %s (%s)', $account?->getCountryCode() ?: 'N/A', $account?->getCountryName() ?: 'N/A'));
+        $this->writeln(sprintf('Checksum:               %s', $account?->getIbanCheckDigits() ?: 'N/A'));
+        $this->writeln(sprintf('National bank code:     %s', $account?->getNationalBankCode() ?: 'N/A'));
+        $this->writeln(sprintf('Branch code:            %s', $account?->getBranchCode() ?: 'N/A'));
+        $this->writeln(sprintf('Account number:         %s', $account?->getAccountNumber() ?: 'N/A'));
+        $this->writeln(sprintf('National check digits:  %s', $account?->getNationalCheckDigits() ?: 'N/A'));
+        $this->writeln(sprintf('IBAN (from account):    %s', $account?->getIban()));
+        $this->writeln(sprintf('IBAN (from account):    %s', $account?->getIbanFormatted()));
         $this->writeln('');
     }
 }

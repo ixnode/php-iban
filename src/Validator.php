@@ -46,23 +46,29 @@ class Validator
             case $given instanceof Iban:
                 $this->iban = $given;
 
-                $accountNumber = $given->getAccountNumber();
-                $bankCode = $given->getNationalBankCode();
                 $countryCode = $given->getCountryCode();
-                $branchCode = $given->getBranchCode();
-                $nationalCheckDigits = $given->getNationalCheckDigits();
+                $bankCode = $given->getNationalBankCode();
+                $accountNumber = $given->getAccountNumber();
 
-                if (is_null($accountNumber) || is_null($bankCode) || is_null($countryCode)) {
+                if (is_null($countryCode) || is_null($bankCode) || is_null($accountNumber)) {
                     $this->account = null;
                     break;
                 }
 
-                $this->account = new Account($accountNumber, $bankCode, $countryCode);
+                $branchCode = $given->getBranchCode();
+                $nationalCheckDigits = $given->getNationalCheckDigits();
 
-                $this->account->setProperties([
-                    Account::KEY_BRANCH_CODE => $branchCode,
-                    Account::KEY_NATIONAL_CHECK_DIGITS => $nationalCheckDigits,
-                ]);
+                $properties = [];
+
+                if (!is_null($branchCode)) {
+                    $properties[IbanFormat::KEY_BRANCH_CODE] = $branchCode;
+                }
+
+                if (!is_null($nationalCheckDigits)) {
+                    $properties[IbanFormat::KEY_NATIONAL_CHECK_DIGITS] = $nationalCheckDigits;
+                }
+
+                $this->account = new Account($accountNumber, $bankCode, $countryCode, $properties);
 
                 break;
 
@@ -85,73 +91,23 @@ class Validator
     }
 
     /**
-     * Returns the IBAN number.
+     * Returns IBAN container.
      *
-     * @return string
-     * @throws IbanParseException
+     * @return Iban
      */
-    public function getIban(): string
+    public function getIban(): Iban
     {
-        return $this->iban->getIban();
+        return $this->iban;
     }
 
     /**
-     * Returns the formatted IBAN number.
+     * Returns the account container.
      *
-     * @return string
-     * @throws IbanParseException
+     * @return Account|null
      */
-    public function getIbanFormatted(): string
+    public function getAccount(): Account|null
     {
-        return $this->iban->getIbanFormatted();
-    }
-
-    /**
-     * Returns the country code of given IBAN number.
-     *
-     * @return string|null
-     */
-    public function getCountryCode(): string|null
-    {
-        return $this->iban->getCountryCode();
-    }
-
-    /**
-     * Returns the country code of given IBAN number.
-     *
-     * @param string $languageCode
-     * @return string|null
-     * @throws ValidatorParseException
-     */
-    public function getCountryName(string $languageCode = Locale::EN_GB): string|null
-    {
-        $countryCode = $this->getCountryCode();
-
-        if (is_null($countryCode)) {
-            return null;
-        }
-
-        if (!array_key_exists($countryCode, CountryAll::COUNTRY_NAMES)) {
-            throw new ValidatorParseException(sprintf('The given country code "%s" is not supported.', $countryCode));
-        }
-
-        $countryNames = CountryAll::COUNTRY_NAMES[$countryCode];
-
-        if (!array_key_exists($languageCode, $countryNames)) {
-            throw new ValidatorParseException(sprintf('The given language code "%s" is not supported.', $languageCode));
-        }
-
-        return $countryNames[$languageCode];
-    }
-
-    /**
-     * Returns the checksum of given IBAN number.
-     *
-     * @return string|null
-     */
-    public function getIbanCheckDigits(): string|null
-    {
-        return $this->iban->getIbanCheckDigits();
+        return $this->account;
     }
 
     /**
@@ -172,45 +128,5 @@ class Validator
     public function hasLastError(): bool
     {
         return $this->iban->hasLastError();
-    }
-
-    /**
-     * Returns the account number.
-     *
-     * @return string|null
-     */
-    public function getAccount(): string|null
-    {
-        return $this->account?->getAccountNumber();
-    }
-
-    /**
-     * Returns the national bank code.
-     *
-     * @return string|null
-     */
-    public function getNationalBankCode(): string|null
-    {
-        return $this->account?->getNationalBankCode();
-    }
-
-    /**
-     * Returns the branch code.
-     *
-     * @return string|null
-     */
-    public function getBranchCode(): string|null
-    {
-        return $this->account?->getBranchCode();
-    }
-
-    /**
-     * Returns the national check digits.
-     *
-     * @return string|null
-     */
-    public function getNationalCheckDigits(): string|null
-    {
-        return $this->account?->getNationalCheckDigits();
     }
 }
