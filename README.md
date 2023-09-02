@@ -53,6 +53,7 @@ print $validator->getIbanFormatted();
 
 ## 2. Supported countries
 
+* AL (Albania)
 * AT (Austria)
 * CH (Switzerland)
 * DE (Germany)

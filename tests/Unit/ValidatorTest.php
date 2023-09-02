@@ -144,9 +144,26 @@ final class ValidatorTest extends TestCase
             ]],
 
             /**
+             * AL: Simple IBAN validator test (positive true tests).
+             *
+             * @see https://www.iban.de/iban-laenderliste.html
+             * @see https://de.iban.com/struktur
+             */
+            [++$number, new Iban('AL35202111090000000001234567'), true, null, [
+                IbanFormat::KEY_COUNTRY_CODE => 'AL',
+                IbanFormat::KEY_IBAN_CHECK_DIGITS => '35',
+                IbanFormat::KEY_NATIONAL_BANK_CODE => '202',
+                IbanFormat::KEY_ACCOUNT_NUMBER => '0000000001234567',
+                IbanFormat::KEY_BRANCH_CODE => '1110',
+                IbanFormat::KEY_NATIONAL_CHECK_DIGITS => '9',
+                IbanFormat::KEY_IBAN_FORMATTED => 'AL35 2021 1109 0000 0000 0123 4567',
+            ]],
+
+            /**
              * ES: Simple IBAN validator test (positive true tests).
              *
              * @see https://www.iban.de/iban-laenderliste.html
+             * @see https://de.iban.com/struktur
              */
             [++$number, new Iban('ES9121000418450200051332'), true, null, [
                 IbanFormat::KEY_COUNTRY_CODE => 'ES',
@@ -171,6 +188,7 @@ final class ValidatorTest extends TestCase
              * FR: Simple IBAN validator test (positive true tests).
              *
              * @see https://www.iban.de/iban-laenderliste.html
+             * @see https://de.iban.com/struktur
              */
             [++$number, new Iban('FR1420041010050500013M02606'), true, null, [
                 IbanFormat::KEY_COUNTRY_CODE => 'FR',
@@ -204,6 +222,7 @@ final class ValidatorTest extends TestCase
              * PT: Simple IBAN validator test (positive true tests).
              *
              * @see https://www.iban.de/iban-laenderliste.html
+             * @see https://de.iban.com/struktur
              */
             [++$number, new Iban('PT50003600409911001102673'), true, null, [
                 IbanFormat::KEY_COUNTRY_CODE => 'PT',

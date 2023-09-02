@@ -25,10 +25,23 @@ use Ixnode\PhpTimezone\Constants\Locale;
  * @author Björn Hempel <bjoern@hempel.li>
  * @version 0.1.0 (2023-09-01)
  * @since 0.1.0 (2023-09-01) First version.
+ * @SuppressWarnings(PHPMD.LongVariable)
  */
 final class Account
 {
+    private string|null $balanceAccountNumber = null;
+
+    private string|null $nationalIdentificationNumber = null;
+
+    private string|null $currencyCode = null;
+
+    private string|null $ownerAccountNumber = null;
+
+    private string|null $bicBankCode = null;
+
     private string|null $branchCode = null;
+
+    private string|null $accountType = null;
 
     private string|null $nationalCheckDigits = null;
 
@@ -82,9 +95,15 @@ final class Account
             }
 
             match ($property) {
+                IbanFormat::KEY_BALANCE_ACCOUNT_NUMBER => $this->setBalanceAccountNumber($value),
+                IbanFormat::KEY_NATIONAL_IDENTIFICATION_NUMBER => $this->setNationalIdentificationNumber($value),
+                IbanFormat::KEY_CURRENCY_CODE => $this->setCurrencyCode($value),
+                IbanFormat::KEY_OWNER_ACCOUNT_NUMBER => $this->setOwnerAccountNumber($value),
+                IbanFormat::KEY_BIC_BANK_CODE => $this->setBicBankCode($value),
                 IbanFormat::KEY_BRANCH_CODE => $this->setBranchCode($value),
+                IbanFormat::KEY_ACCOUNT_TYPE => $this->setAccountType($value),
                 IbanFormat::KEY_NATIONAL_CHECK_DIGITS => $this->setNationalCheckDigits($value),
-                default => throw new AccountParseException(sprintf('Unknown property "%s" given.', $property)),
+                default => throw new AccountParseException(sprintf('Unknown property "%s".', $property)),
             };
         }
 
@@ -144,6 +163,102 @@ final class Account
     /**
      * @return string|null
      */
+    public function getBalanceAccountNumber(): ?string
+    {
+        return $this->balanceAccountNumber;
+    }
+
+    /**
+     * @param string|null $balanceAccountNumber
+     * @return self
+     */
+    public function setBalanceAccountNumber(?string $balanceAccountNumber): self
+    {
+        $this->balanceAccountNumber = $balanceAccountNumber;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getNationalIdentificationNumber(): ?string
+    {
+        return $this->nationalIdentificationNumber;
+    }
+
+    /**
+     * @param string|null $nationalIdentificationNumber
+     * @return self
+     * @SuppressWarnings(PHPMD.LongVariable)
+     */
+    public function setNationalIdentificationNumber(?string $nationalIdentificationNumber): self
+    {
+        $this->nationalIdentificationNumber = $nationalIdentificationNumber;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getCurrencyCode(): ?string
+    {
+        return $this->currencyCode;
+    }
+
+    /**
+     * @param string|null $currencyCode
+     * @return self
+     */
+    public function setCurrencyCode(?string $currencyCode): self
+    {
+        $this->currencyCode = $currencyCode;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getOwnerAccountNumber(): ?string
+    {
+        return $this->ownerAccountNumber;
+    }
+
+    /**
+     * @param string|null $ownerAccountNumber
+     * @return self
+     */
+    public function setOwnerAccountNumber(?string $ownerAccountNumber): self
+    {
+        $this->ownerAccountNumber = $ownerAccountNumber;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getBicBankCode(): ?string
+    {
+        return $this->bicBankCode;
+    }
+
+    /**
+     * @param string|null $bicBankCode
+     * @return self
+     */
+    public function setBicBankCode(?string $bicBankCode): self
+    {
+        $this->bicBankCode = $bicBankCode;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
     public function getBranchCode(): ?string
     {
         return $this->branchCode;
@@ -156,6 +271,25 @@ final class Account
     public function setBranchCode(?string $branchCode): self
     {
         $this->branchCode = $branchCode;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getAccountType(): ?string
+    {
+        return $this->accountType;
+    }
+
+    /**
+     * @param string|null $accountType
+     * @return self
+     */
+    public function setAccountType(?string $accountType): self
+    {
+        $this->accountType = $accountType;
 
         return $this;
     }
