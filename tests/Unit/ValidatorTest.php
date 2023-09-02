@@ -70,7 +70,7 @@ final class ValidatorTest extends TestCase
         $this->assertSame($validator->isValid(), $valid);
         $this->assertSame($validator->getLastError(), $lastError);
         $this->assertSame($validator->getCountryCode(), $countryCode);
-        $this->assertSame($validator->getChecksum(), $checksum);
+        $this->assertSame($validator->getIbanCheckDigits(), $checksum);
         $this->assertSame($validator->getAccountNumber(), $accountNumber);
         $this->assertSame($validator->getBankCode(), $bankCode);
     }
@@ -88,7 +88,11 @@ final class ValidatorTest extends TestCase
 
             /**
              * Simple IBAN validator test (positive true tests).
+             *
+             * @see https://ibanvalidieren.de/beispiele.html
              */
+            [++$number, new Iban('AT026000000001349870'), true, null, 'AT', '02', '00001349870', '60000'],
+            [++$number, new Iban('CH0209000000100013997'), true, null, 'CH', '02', '000100013997', '09000'],
             [++$number, new Iban('DE02120300000000202051'), true, null, 'DE', '02', '0000202051', '12030000'],
 
             /**

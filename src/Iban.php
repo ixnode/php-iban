@@ -26,11 +26,50 @@ use Ixnode\PhpIban\Exception\IbanParseException;
  */
 final class Iban
 {
-    private const CHECKSUM_CHAR = 'k';
+    /* Balance account number */
+    /** @phpstan-ignore-next-line */
+    private const BALANCE_ACCOUNT_NUMBER = 'a';
 
-    private const BANK_CODE_CHAR = 'b';
+    /* National bank code */
+    private const NATIONAL_BANK_CODE = 'b';
 
-    private const ACCOUNT_NUMBER_CHAR = 'c';
+    /* Account number */
+    private const ACCOUNT_NUMBER = 'c';
+
+    /* National identification number */
+    /** @phpstan-ignore-next-line */
+    private const NATIONAL_IDENTIFICATION_NUMBER = 'i';
+
+    /* IBAN check digits */
+    private const IBAN_CHECK_DIGITS = 'k';
+
+    /* Currency code */
+    /** @phpstan-ignore-next-line */
+    private const CURRENCY_CODE = 'm';
+
+    /* Owner account number */
+    /** @phpstan-ignore-next-line */
+    private const OWNER_ACCOUNT_NUMBER = 'n';
+
+    /* BIC bank code */
+    /** @phpstan-ignore-next-line */
+    private const BIC_BANK_CODE = 'q';
+
+    /* Branch code */
+    /** @phpstan-ignore-next-line */
+    private const BRANCH_CODE = 's';
+
+    /* Account type */
+    /** @phpstan-ignore-next-line */
+    private const ACCOUNT_TYPE = 't';
+
+    /* National check digits */
+    /** @phpstan-ignore-next-line */
+    private const NATIONAL_CHECK_DIGITS = 'x';
+
+    /* Always zero */
+    /** @phpstan-ignore-next-line */
+    private const ALWAYS_ZERO = '0';
 
     private string|null $lastError = null;
 
@@ -38,7 +77,7 @@ final class Iban
 
     private string|null $countryCode = null;
 
-    private string|null $checksum = null;
+    private string|null $ibanCheckDigits = null;
 
     private string|null $bankCode = null;
 
@@ -53,7 +92,7 @@ final class Iban
     {
         if (!$this->parseIban()) {
             $this->countryCode = null;
-            $this->checksum = null;
+            $this->ibanCheckDigits = null;
             $this->bankCode = null;
             $this->accountNumber = null;
         }
@@ -78,23 +117,30 @@ final class Iban
             return false;
         }
 
-        $format = $this->getIbanFormat($country);
+        $ibanFormat = $this->getIbanFormat($country);
 
-        if (strlen($iban) !== strlen($format)) {
-            $this->lastError = sprintf('Invalid length of IBAN given: "%s" (expected: "%s").', $iban, $format);
+        if ($this->checkIbanFormat($ibanFormat) !== '') {
+            $this->lastError = sprintf('The given country "%s" is not supported yet (Unsupported iban format char).', $country);
+            $this->valid = false;
+
+            return false;
+        }
+
+        if (strlen($iban) !== strlen($ibanFormat)) {
+            $this->lastError = sprintf('Invalid length of IBAN given: "%s" (expected: "%s").', $iban, $ibanFormat);
             $this->valid = false;
 
             return false;
         }
 
         $this->countryCode = $country;
-        $this->checksum = $this->extractInformation($country, self::CHECKSUM_CHAR);
-        $this->bankCode = $this->extractInformation($country, self::BANK_CODE_CHAR);
-        $this->accountNumber = $this->extractInformation($country, self::ACCOUNT_NUMBER_CHAR);
+        $this->ibanCheckDigits = $this->extractInformation($country, self::IBAN_CHECK_DIGITS);
+        $this->bankCode = $this->extractInformation($country, self::NATIONAL_BANK_CODE);
+        $this->accountNumber = $this->extractInformation($country, self::ACCOUNT_NUMBER);
 
         $accountNumber = new AccountNumber($this->accountNumber, $this->bankCode, $this->countryCode);
 
-        if ($accountNumber->getChecksum() !== $this->checksum) {
+        if ($accountNumber->getChecksum() !== $this->ibanCheckDigits) {
             $this->lastError = 'The checksum does not match.';
             $this->valid = false;
 
@@ -124,6 +170,29 @@ final class Iban
     }
 
     /**
+     * Checks the IBAN format if it is supported.
+     *
+     * @param string $ibanFormat
+     * @return string
+     */
+    private function checkIbanFormat(string $ibanFormat): string
+    {
+        /* Remove country code from IBAN format */
+        $ibanFormat = substr($ibanFormat, 2);
+
+        /* Remove supported characters from IBAN format */
+        return str_replace(
+            [
+                self::NATIONAL_BANK_CODE,
+                self::ACCOUNT_NUMBER,
+                self::IBAN_CHECK_DIGITS,
+            ],
+            '',
+            $ibanFormat
+        );
+    }
+
+    /**
      * Extracts information
      *
      * @param string $country
@@ -134,16 +203,20 @@ final class Iban
      */
     private function extractInformation(string $country, string $code): string
     {
-        $format = $this->getIbanFormat($country);
+        $ibanFormat = $this->getIbanFormat($country);
 
-        $position = strpos($format, $code);
+        if ($this->checkIbanFormat($ibanFormat) !== '') {
+            throw new IbanParseException(sprintf('The given country "%s" is not supported yet.', $country));
+        }
+
+        $position = strpos($ibanFormat, $code);
 
         if ($position === false) {
-            throw new TypeInvalidException($code, $format);
+            throw new TypeInvalidException($code, $ibanFormat);
         }
 
         $matches = [];
-        preg_match(sprintf('~[%s]+~', $code), $format, $matches);
+        preg_match(sprintf('~[%s]+~', $code), $ibanFormat, $matches);
 
         return substr($this->iban, $position, strlen((string) $matches[0]));
     }
@@ -156,6 +229,16 @@ final class Iban
     public function getIban(): string
     {
         return $this->iban;
+    }
+
+    /**
+     * Returns the formatted IBAN number.
+     *
+     * @return string
+     */
+    public function getIbanFormatted(): string
+    {
+        return trim(chunk_split($this->getIban(), 4, ' '));
     }
 
     /**
@@ -201,9 +284,9 @@ final class Iban
     /**
      * @return string|null
      */
-    public function getChecksum(): string|null
+    public function getIbanCheckDigits(): string|null
     {
-        return $this->checksum;
+        return $this->ibanCheckDigits;
     }
 
     /**

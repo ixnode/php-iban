@@ -81,6 +81,16 @@ class Validator
     }
 
     /**
+     * Returns the formatted IBAN number.
+     *
+     * @return string
+     */
+    public function getIbanFormatted(): string
+    {
+        return $this->iban->getIbanFormatted();
+    }
+
+    /**
      * Returns the country code of given IBAN number.
      *
      * @return string|null
@@ -95,9 +105,9 @@ class Validator
      *
      * @return string|null
      */
-    public function getChecksum(): string|null
+    public function getIbanCheckDigits(): string|null
     {
-        return $this->iban->getChecksum();
+        return $this->iban->getIbanCheckDigits();
     }
 
     /**
