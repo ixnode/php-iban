@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.1.1] - 2023-09-02
+
+* Add README.md updates
+
 ### [0.1.0] - 2023-09-01
 
 * Initial release with first Coordinate parser and converter
