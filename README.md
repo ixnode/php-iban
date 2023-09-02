@@ -16,6 +16,7 @@
 ## 1. Usage
 
 ```php
+use Ixnode\PhpIban\AccountNumber;
 use Ixnode\PhpIban\Iban;
 use Ixnode\PhpIban\Validator;
 ```
@@ -33,6 +34,18 @@ print $validator->getAccountNumber();
 // (string) 0000202051
 
 etc.
+```
+
+### 1.2 Account number and bank code converter example
+
+```php
+$accountNumber = '0000202051';
+$bankCode = '12030000';
+$countryCode = 'DE';
+$validator = new Validator(new AccountNumber($accountNumber, $bankCode, $countryCode));
+
+print $validator->getIban();
+// (string) DE02120300000000202051
 ```
 
 ## 2. Supported countries
@@ -59,6 +72,8 @@ vendor/bin/php-iban -V
 
 ## 4. Command line tool
 
+### 4.1 Check IBAN number
+
 > Used to quickly check a given IBAN number.
 
 ```bash
@@ -74,6 +89,38 @@ vendor/bin/php-iban iban:validate DE02120300000000202051
 ```bash
 
 Given IBAN:     DE02120300000000202051
+
+Parsed IBAN
+-----------
+IBAN:           DE02120300000000202051
+Valid:          YES
+Last error:     N/A
+Country:        DE
+Checksum:       02
+Account number: 0000202051
+Bank number:    12030000
+
+```
+
+### 4.2 Generate IBAN number
+
+> Used to quickly generate an IBAN number.
+
+```bash
+bin/console account-number:validate 0000202051 12030000
+```
+
+or within your composer project:
+
+```bash
+vendor/bin/php-iban account-number:validate 0000202051 12030000
+```
+
+```bash
+
+Given account number: 0000202051
+Given bank code:      12030000
+Given country code:   DE
 
 Parsed IBAN
 -----------
