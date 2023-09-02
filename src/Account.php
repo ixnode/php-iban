@@ -206,6 +206,13 @@ final class Account
                 $this->getAccountNumber(),
                 $this->getNationalCheckDigits()
             ),
+            CountryEurope::COUNTRY_CODE_ES => sprintf(
+                '%s%s%s%s',
+                $this->getNationalBankCode(),
+                $this->getBranchCode(),
+                $this->getNationalCheckDigits(),
+                $this->getAccountNumber()
+            ),
             default => throw new AccountParseException(sprintf('Country code "%s" is not supported.', $this->countryCode)),
         };
     }

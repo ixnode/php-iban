@@ -157,6 +157,30 @@ final class ValidatorTest extends TestCase
             ]],
 
             /**
+             * ES: Simple IBAN validator test (positive true tests).
+             *
+             * @see https://www.iban.de/iban-laenderliste.html
+             */
+            [++$number, new Iban('ES9121000418450200051332'), true, null, [
+                self::KEY_COUNTRY_CODE => 'ES',
+                self::KEY_IBAN_CHECK_DIGITS => '91',
+                self::KEY_NATIONAL_BANK_CODE => '2100',
+                self::KEY_ACCOUNT_NUMBER => '0200051332',
+                self::KEY_BRANCH_CODE => '0418',
+                self::KEY_NATIONAL_CHECK_DIGITS => '45',
+                self::KEY_IBAN_FORMATTED => 'ES91 2100 0418 4502 0005 1332',
+            ]],
+            [++$number, new Iban('ES6720310000010118272402'), true, null, [
+                self::KEY_COUNTRY_CODE => 'ES',
+                self::KEY_IBAN_CHECK_DIGITS => '67',
+                self::KEY_NATIONAL_BANK_CODE => '2031',
+                self::KEY_ACCOUNT_NUMBER => '0118272402',
+                self::KEY_BRANCH_CODE => '0000',
+                self::KEY_NATIONAL_CHECK_DIGITS => '01',
+                self::KEY_IBAN_FORMATTED => 'ES67 2031 0000 0101 1827 2402',
+            ]],
+
+            /**
              * FR: Simple IBAN validator test (positive true tests).
              *
              * @see https://www.iban.de/iban-laenderliste.html

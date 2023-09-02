@@ -53,11 +53,12 @@ print $validator->getIbanFormatted();
 
 ## 2. Supported countries
 
-* AT
-* CH
-* DE
-* LI
-* FR
+* AT (Austria)
+* CH (Switzerland)
+* DE (Germany)
+* ES (Spain)
+* FR (France)
+* LI (Liechtenstein)
 
 See https://en.wikipedia.org/wiki/International_Bank_Account_Number#IBAN_formats_by_country to add more countries.
 
