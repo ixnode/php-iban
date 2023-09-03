@@ -267,6 +267,22 @@ final class ValidatorTest extends TestCase
             ]],
 
             /**
+             * TR: Simple IBAN validator test (positive true tests).
+             *
+             * @see https://www.iban.de/iban-laenderliste.html
+             * @see https://de.iban.com/struktur
+             */
+            [++$number, new Iban('TR320010009999901234567890'), true, null, [
+                IbanFormat::KEY_COUNTRY_CODE => 'TR',
+                IbanFormat::KEY_IBAN_CHECK_DIGITS => '32',
+                IbanFormat::KEY_NATIONAL_BANK_CODE => '00100',
+                IbanFormat::KEY_ACCOUNT_NUMBER => '9999901234567890',
+                IbanFormat::KEY_BRANCH_CODE => null,
+                IbanFormat::KEY_NATIONAL_CHECK_DIGITS => null,
+                IbanFormat::KEY_IBAN_FORMATTED => 'TR32 0010 0099 9990 1234 5678 90',
+            ]],
+
+            /**
              * Wrong checksum (positive false tests).
              */
             [++$number, new Iban('DE03120300000000202051'), false, 'The checksum does not match.', [

@@ -33,6 +33,7 @@ final class Iban
         IbanFormat::CODE_ACCOUNT_NUMBER,
         IbanFormat::CODE_IBAN_CHECK_DIGITS,
         IbanFormat::CODE_NATIONAL_CHECK_DIGITS,
+        IbanFormat::ALWAYS_ZERO,
     ];
 
     private string|null $lastError = null;

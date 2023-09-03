@@ -86,8 +86,7 @@ final readonly class IbanFormat
 
 
     /* Always zero: 0 */
-    /** @phpstan-ignore-next-line */
-    private const ALWAYS_ZERO = '0';
+    final public const ALWAYS_ZERO = '0';
 
 
     /* IBAN formatted */
@@ -136,7 +135,9 @@ final readonly class IbanFormat
 
         $characters = str_split($ibanFormat);
 
-        return array_values(array_unique($characters));
+        $ibanFormatCodesWithZero = array_values(array_unique($characters));
+
+        return array_diff($ibanFormatCodesWithZero, [self::ALWAYS_ZERO]);
     }
 
     /**
