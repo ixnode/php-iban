@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.1.12] - 2023-09-03
+
+* Add IBAN validator for country Turkey
+* IBAN number with fixed numbers
+
 ### [0.1.11] - 2023-09-03
 
 * Add IBAN validator for country Andorra and Aserbaidschan
