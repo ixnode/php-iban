@@ -78,10 +78,10 @@ $account = new Account($accountNumber, $bankCode, $countryCode, [
 ]);
 
 print $account->getIban();
-// (string) DE02120300000000202051
+// (string) FR7630027175330002005370159
 
 print $account->getIbanFormatted();
-// (string) DE02 1203 0000 0000 2020 51
+// (string) FR76 3002 7175 3300 0200 5370 159
 ```
 
 ## 2. Supported countries
