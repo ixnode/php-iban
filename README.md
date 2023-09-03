@@ -15,15 +15,16 @@
 
 ## 1. Usage
 
-```php
-use Ixnode\PhpIban\Account;
-use Ixnode\PhpIban\Iban;
-use Ixnode\PhpIban\Validator;
-```
+Some usage examples.
 
 ### 1.1 IBAN parser example
 
 ```php
+use Ixnode\PhpIban\Iban;
+use Ixnode\PhpIban\Validator;
+
+...
+
 $iban = 'DE02120300000000202051';
 $validator = new Validator(new Iban($iban));
 
@@ -36,22 +37,53 @@ print $validator->getAccountNumber();
 etc.
 ```
 
-### 1.2 Account number and bank code converter example
+### 1.2 Account number and bank code converter example (AT, CH, DE, LI, etc.)
 
 ```php
+use Ixnode\PhpIban\Account;
+
+...
+
 $accountNumber = '0000202051';
 $bankCode = '12030000';
 $countryCode = 'DE';
-$validator = new Validator(new AccountNumber($accountNumber, $bankCode, $countryCode));
+$account = new Account($accountNumber, $bankCode, $countryCode);
 
-print $validator->getIban();
+print $account->getIban();
 // (string) DE02120300000000202051
 
-print $validator->getIbanFormatted();
+print $account->getIbanFormatted();
+// (string) DE02 1203 0000 0000 2020 51
+```
+
+### 1.3 Account number and bank code converter example (FR)
+
+```php
+use Ixnode\PhpIban\Account;
+use Ixnode\PhpIban\Constant\IbanFormats;
+
+...
+
+$accountNumber = '00020053701';
+$bankCode = '30027';
+$countryCode = 'FR';
+$branchCode = '17533';
+$nationalCheckDigits = '59';
+$account = new Account($accountNumber, $bankCode, $countryCode, [
+    IbanFormat::KEY_BRANCH_CODE => $branchCode,
+    IbanFormat::KEY_NATIONAL_CHECK_DIGITS => $nationalCheckDigits,
+]);
+
+print $account->getIban();
+// (string) DE02120300000000202051
+
+print $account->getIbanFormatted();
 // (string) DE02 1203 0000 0000 2020 51
 ```
 
 ## 2. Supported countries
+
+Checked countries and added tests (other countries might work too):
 
 * AD (Andorra)
 * AL (Albania)
@@ -64,6 +96,8 @@ print $validator->getIbanFormatted();
 * LI (Liechtenstein)
 * PT (Portugal)
 * TR (Turkey)
+
+All added countries you can find here: `Ixnode\PhpIban\Constant\IbanFormats::IBAN_FORMATS`
 
 See https://en.wikipedia.org/wiki/International_Bank_Account_Number#IBAN_formats_by_country to add more countries.
 
