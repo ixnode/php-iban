@@ -31,8 +31,11 @@ $validator = new Validator(new Iban($iban));
 print $validator->isValid() ? 'YES' : 'NO';
 // (string) YES
 
-print $validator->getAccountNumber();
+print $validator->getAccount()->getAccountNumber();
 // (string) 0000202051
+
+print $validator->getIban()->getIbanFormatted();
+// (string) DE02 1203 0000 0000 2020 51
 
 etc.
 ```
