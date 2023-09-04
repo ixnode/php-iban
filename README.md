@@ -112,6 +112,8 @@ Checked countries and added tests (other countries might work too):
 * GL (Greenland)
 * GR (Greece)
 * GT (Guatemala)
+* IE (Ireland)
+* IQ (Iraq)
 * LI (Liechtenstein)
 * PT (Portugal)
 * SV (El Salvador)
