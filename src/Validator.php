@@ -55,21 +55,7 @@ class Validator
                     break;
                 }
 
-                $branchCode = $given->getBranchCode();
-                $nationalCheckDigits = $given->getNationalCheckDigits();
-
-                $properties = [];
-
-                if (!is_null($branchCode)) {
-                    $properties[IbanFormat::KEY_BRANCH_CODE] = $branchCode;
-                }
-
-                if (!is_null($nationalCheckDigits)) {
-                    $properties[IbanFormat::KEY_NATIONAL_CHECK_DIGITS] = $nationalCheckDigits;
-                }
-
-                $this->account = new Account($accountNumber, $bankCode, $countryCode, $properties);
-
+                $this->account = new Account($accountNumber, $bankCode, $countryCode, $this->iban);
                 break;
 
             case $given instanceof Account:

@@ -166,7 +166,7 @@ final readonly class IbanFormat
     }
 
     /**
-     * Returns the IBAN format keys.
+     * Returns the IBAN format keys by given IBAN format string.
      *
      * @param array<int, string> $except
      * @return array<int, string>
@@ -180,7 +180,31 @@ final readonly class IbanFormat
             $propertyKeys[] = $this->getIbanFormatKeyByCode($code);
         }
 
-        return array_diff($propertyKeys, $except);
+        return array_values(array_diff($propertyKeys, $except));
+    }
+
+    /**
+     * Returns all IBAN format keys.
+     *
+     * @param array<int, string> $except
+     * @return array<int, string>
+     */
+    public function getIbanFormatPropertyKeysAll(array $except = []): array
+    {
+        $propertyKeys = [
+            IbanFormat::KEY_NATIONAL_BANK_CODE,
+            IbanFormat::KEY_ACCOUNT_NUMBER,
+            IbanFormat::KEY_BALANCE_ACCOUNT_NUMBER,
+            IbanFormat::KEY_NATIONAL_IDENTIFICATION_NUMBER,
+            IbanFormat::KEY_CURRENCY_CODE,
+            IbanFormat::KEY_OWNER_ACCOUNT_NUMBER,
+            IbanFormat::KEY_BIC_BANK_CODE,
+            IbanFormat::KEY_BRANCH_CODE,
+            IbanFormat::KEY_ACCOUNT_TYPE,
+            IbanFormat::KEY_NATIONAL_CHECK_DIGITS,
+        ];
+
+        return array_values(array_diff($propertyKeys, $except));
     }
 
     /**
@@ -235,7 +259,7 @@ final readonly class IbanFormat
      *
      * @param Account $account
      * @return string
-     * @throws Exception\AccountParseException
+     * @throws AccountParseException
      * @throws IbanParseException
      */
     public function getIbanRaw(Account $account): string
@@ -272,7 +296,13 @@ final readonly class IbanFormat
                 IbanFormat::CODE_IBAN_CHECK_DIGITS => $account->getIbanCheckDigits(),
                 IbanFormat::CODE_NATIONAL_BANK_CODE => $account->getNationalBankCode(),
                 IbanFormat::CODE_ACCOUNT_NUMBER => $account->getAccountNumber(),
+                IbanFormat::CODE_BALANCE_ACCOUNT_NUMBER => $account->getBalanceAccountNumber(),
+                IbanFormat::CODE_NATIONAL_IDENTIFICATION_NUMBER => $account->getNationalIdentificationNumber(),
+                IbanFormat::CODE_CURRENCY_CODE => $account->getCurrencyCode(),
+                IbanFormat::CODE_OWNER_ACCOUNT_NUMBER => $account->getOwnerAccountNumber(),
+                IbanFormat::CODE_BIC_BANK_CODE => $account->getBicBankCode(),
                 IbanFormat::CODE_BRANCH_CODE => $account->getBranchCode(),
+                IbanFormat::CODE_ACCOUNT_TYPE => $account->getAccountType(),
                 IbanFormat::CODE_NATIONAL_CHECK_DIGITS => $account->getNationalCheckDigits(),
                 default => throw new IbanParseException(sprintf('Unsupported iban format code "%s".', $ibanFormatCode)),
             };

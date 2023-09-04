@@ -29,9 +29,11 @@ final class Iban
 {
     private const SUPPORTED_CODES = [
         IbanFormat::CODE_NATIONAL_BANK_CODE,
-        IbanFormat::CODE_BRANCH_CODE,
         IbanFormat::CODE_ACCOUNT_NUMBER,
         IbanFormat::CODE_IBAN_CHECK_DIGITS,
+        IbanFormat::CODE_OWNER_ACCOUNT_NUMBER,
+        IbanFormat::CODE_BRANCH_CODE,
+        IbanFormat::CODE_ACCOUNT_TYPE,
         IbanFormat::CODE_NATIONAL_CHECK_DIGITS,
         IbanFormat::ALWAYS_ZERO,
     ];
@@ -146,17 +148,7 @@ final class Iban
             throw new IbanParseException(sprintf('No national bank code was found in the given IBAN "%s".', $iban));
         }
 
-        $properties = [];
-
-        if (!is_null($this->branchCode)) {
-            $properties[IbanFormat::KEY_BRANCH_CODE] = $this->branchCode;
-        }
-
-        if (!is_null($this->nationalCheckDigits)) {
-            $properties[IbanFormat::KEY_NATIONAL_CHECK_DIGITS] = $this->nationalCheckDigits;
-        }
-
-        $account = new Account($this->accountNumber, $this->nationalBankCode, $this->countryCode, $properties);
+        $account = new Account($this->accountNumber, $this->nationalBankCode, $this->countryCode, $this);
 
         if ($account->getIbanCheckDigits() !== $this->ibanCheckDigits) {
             $this->lastError = 'The checksum does not match.';

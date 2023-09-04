@@ -57,10 +57,79 @@ final class Account
         private readonly string $accountNumber,
         private readonly string $nationalBankCode,
         private readonly string $countryCode,
-        array $properties = []
+        array|Iban $properties = []
     )
     {
-        $this->setProperties($properties);
+        match (true) {
+            is_array($properties) => $this->setProperties($properties),
+            $properties instanceof Iban => $this->setPropertiesFromIban($properties),
+        };
+    }
+
+    /**
+     * @param Iban $iban
+     * @return void
+     * @throws AccountParseException
+     * @throws IbanParseException
+     */
+    private function setPropertiesFromIban(Iban $iban): void
+    {
+        $ibanFormat = new IbanFormat($this->countryCode);
+
+        $ignoredProperties = [
+            IbanFormat::KEY_NATIONAL_BANK_CODE,
+            IbanFormat::KEY_ACCOUNT_NUMBER,
+        ];
+
+        $availableProperties = $ibanFormat->getIbanFormatPropertyKeysAll($ignoredProperties);
+        $expectedProperties = $ibanFormat->getIbanFormatPropertyKeys($ignoredProperties);
+
+        $missingProperties = [];
+        $unknownProperties = [];
+
+        foreach ($availableProperties as $property) {
+            $value = match ($property) {
+                IbanFormat::KEY_NATIONAL_BANK_CODE => $iban->getNationalBankCode(),
+                IbanFormat::KEY_ACCOUNT_NUMBER => $iban->getAccountNumber(),
+                IbanFormat::KEY_BALANCE_ACCOUNT_NUMBER => $iban->getBalanceAccountNumber(),
+                IbanFormat::KEY_NATIONAL_IDENTIFICATION_NUMBER => $iban->getNationalIdentificationNumber(),
+                IbanFormat::KEY_CURRENCY_CODE => $iban->getCurrencyCode(),
+                IbanFormat::KEY_OWNER_ACCOUNT_NUMBER => $iban->getOwnerAccountNumber(),
+                IbanFormat::KEY_BIC_BANK_CODE => $iban->getBicBankCode(),
+                IbanFormat::KEY_BRANCH_CODE => $iban->getBranchCode(),
+                IbanFormat::KEY_ACCOUNT_TYPE => $iban->getAccountType(),
+                IbanFormat::KEY_NATIONAL_CHECK_DIGITS => $iban->getNationalCheckDigits(),
+                default => throw new AccountParseException(sprintf('Unknown property "%s".', $property)),
+            };
+
+            match (true) {
+                in_array($property, $expectedProperties) && is_null($value) => $missingProperties[] = $property,
+                !in_array($property, $expectedProperties) && !is_null($value) => $unknownProperties[] = $property,
+                default => null,
+            };
+        }
+
+        if (count($missingProperties) > 0) {
+            throw new AccountParseException(sprintf('Missing properties: %s', implode(', ', $missingProperties)));
+        }
+
+        if (count($unknownProperties) > 0) {
+            throw new AccountParseException(sprintf('Unknown properties: %s', implode(', ', $unknownProperties)));
+        }
+
+        foreach ($expectedProperties as $property) {
+            match ($property) {
+                IbanFormat::KEY_BALANCE_ACCOUNT_NUMBER => $this->setBalanceAccountNumber($iban->getBalanceAccountNumber()),
+                IbanFormat::KEY_NATIONAL_IDENTIFICATION_NUMBER => $this->setNationalIdentificationNumber($iban->getNationalIdentificationNumber()),
+                IbanFormat::KEY_CURRENCY_CODE => $this->setCurrencyCode($iban->getCurrencyCode()),
+                IbanFormat::KEY_OWNER_ACCOUNT_NUMBER => $this->setOwnerAccountNumber($iban->getOwnerAccountNumber()),
+                IbanFormat::KEY_BIC_BANK_CODE => $this->setBicBankCode($iban->getBicBankCode()),
+                IbanFormat::KEY_BRANCH_CODE => $this->setBranchCode($iban->getBranchCode()),
+                IbanFormat::KEY_ACCOUNT_TYPE => $this->setAccountType($iban->getAccountType()),
+                IbanFormat::KEY_NATIONAL_CHECK_DIGITS => $this->setNationalCheckDigits($iban->getNationalCheckDigits()),
+                default => throw new AccountParseException(sprintf('Unknown property "%s".', $property)),
+            };
+        }
     }
 
     /**
@@ -111,26 +180,6 @@ final class Account
     }
 
     /**
-     * Returns the account number.
-     *
-     * @return string
-     */
-    public function getAccountNumber(): string
-    {
-        return $this->accountNumber;
-    }
-
-    /**
-     * Returns the bank code.
-     *
-     * @return string
-     */
-    public function getNationalBankCode(): string
-    {
-        return $this->nationalBankCode;
-    }
-
-    /**
      * @return string
      */
     public function getCountryCode(): string
@@ -158,6 +207,26 @@ final class Account
         }
 
         return $countryNames[$languageCode];
+    }
+
+    /**
+     * Returns the account number.
+     *
+     * @return string
+     */
+    public function getAccountNumber(): string
+    {
+        return $this->accountNumber;
+    }
+
+    /**
+     * Returns the bank code.
+     *
+     * @return string
+     */
+    public function getNationalBankCode(): string
+    {
+        return $this->nationalBankCode;
     }
 
     /**

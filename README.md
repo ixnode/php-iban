@@ -92,6 +92,11 @@ Checked countries and added tests (other countries might work too):
 * AL (Albania)
 * AT (Austria)
 * AZ (Azerbaijan)
+* BA (Bosnia and Herzegovina)
+* BE (Belgium)
+* BG (Bulgaria)
+* BH (Bahrain)
+* BR (Brazil)
 * CH (Switzerland)
 * DE (Germany)
 * ES (Spain)
@@ -99,6 +104,7 @@ Checked countries and added tests (other countries might work too):
 * LI (Liechtenstein)
 * PT (Portugal)
 * TR (Turkey)
+* VG (Virgin Islands)
 
 All added countries you can find here: `Ixnode\PhpIban\Constant\IbanFormats::IBAN_FORMATS`
 
