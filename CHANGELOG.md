@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.1.18] - 2023-09-04
+
+* Add more IBAN countries and tests
+* Add national-identification-number
+
 ### [0.1.17] - 2023-09-04
 
 * Add more IBAN countries and tests
