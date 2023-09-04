@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6aab3f138673b61d19c79a45fd2c3462",
+    "content-hash": "337ec12b108dc21a39c692d2ea09c8dc",
     "packages": [
         {
             "name": "adhocore/cli",
@@ -264,16 +264,16 @@
         },
         {
             "name": "ixnode/php-timezone",
-            "version": "0.1.17",
+            "version": "0.1.18",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ixnode/php-timezone.git",
-                "reference": "3efef7fb559cfec847a0a66151021f46e434c246"
+                "reference": "020dc399760fe1c86729e3844708db6ed6480a11"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ixnode/php-timezone/zipball/3efef7fb559cfec847a0a66151021f46e434c246",
-                "reference": "3efef7fb559cfec847a0a66151021f46e434c246",
+                "url": "https://api.github.com/repos/ixnode/php-timezone/zipball/020dc399760fe1c86729e3844708db6ed6480a11",
+                "reference": "020dc399760fe1c86729e3844708db6ed6480a11",
                 "shasum": ""
             },
             "require": {
@@ -317,9 +317,9 @@
             ],
             "support": {
                 "issues": "https://github.com/ixnode/php-timezone/issues",
-                "source": "https://github.com/ixnode/php-timezone/tree/0.1.17"
+                "source": "https://github.com/ixnode/php-timezone/tree/0.1.18"
             },
-            "time": "2023-08-26T20:54:37+00:00"
+            "time": "2023-09-04T20:48:06+00:00"
         }
     ],
     "packages-dev": [
