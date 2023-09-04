@@ -114,6 +114,7 @@ Checked countries and added tests (other countries might work too):
 * GT (Guatemala)
 * IE (Ireland)
 * IQ (Iraq)
+* IS (Iceland)
 * LI (Liechtenstein)
 * PT (Portugal)
 * SV (El Salvador)
