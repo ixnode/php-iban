@@ -94,6 +94,7 @@ abstract class BaseCommand extends Command
         $this->writeln(sprintf('National identification number:  %s', $account?->getNationalIdentificationNumber() ?: 'N/A'));
         $this->writeln(sprintf('Currency code:                   %s', $account?->getCurrencyCode() ?: 'N/A'));
         $this->writeln(sprintf('Owner account number:            %s', $account?->getOwnerAccountNumber() ?: 'N/A'));
+        $this->writeln(sprintf('Account number prefix:           %s', $account?->getAccountNumberPrefix() ?: 'N/A'));
         $this->writeln(sprintf('Bic bank code:                   %s', $account?->getBicBankCode() ?: 'N/A'));
         $this->writeln(sprintf('Branch code:                     %s', $account?->getBranchCode() ?: 'N/A'));
         $this->writeln(sprintf('Account type:                    %s', $account?->getAccountType() ?: 'N/A'));

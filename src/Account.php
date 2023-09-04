@@ -37,6 +37,8 @@ final class Account
 
     private string|null $ownerAccountNumber = null;
 
+    private string|null $accountNumberPrefix = null;
+
     private string|null $bicBankCode = null;
 
     private string|null $branchCode = null;
@@ -95,6 +97,7 @@ final class Account
                 IbanFormat::KEY_NATIONAL_IDENTIFICATION_NUMBER => $iban->getNationalIdentificationNumber(),
                 IbanFormat::KEY_CURRENCY_CODE => $iban->getCurrencyCode(),
                 IbanFormat::KEY_OWNER_ACCOUNT_NUMBER => $iban->getOwnerAccountNumber(),
+                IbanFormat::KEY_ACCOUNT_NUMBER_PREFIX => $iban->getAccountNumberPrefix(),
                 IbanFormat::KEY_BIC_BANK_CODE => $iban->getBicBankCode(),
                 IbanFormat::KEY_BRANCH_CODE => $iban->getBranchCode(),
                 IbanFormat::KEY_ACCOUNT_TYPE => $iban->getAccountType(),
@@ -123,6 +126,7 @@ final class Account
                 IbanFormat::KEY_NATIONAL_IDENTIFICATION_NUMBER => $this->setNationalIdentificationNumber($iban->getNationalIdentificationNumber()),
                 IbanFormat::KEY_CURRENCY_CODE => $this->setCurrencyCode($iban->getCurrencyCode()),
                 IbanFormat::KEY_OWNER_ACCOUNT_NUMBER => $this->setOwnerAccountNumber($iban->getOwnerAccountNumber()),
+                IbanFormat::KEY_ACCOUNT_NUMBER_PREFIX => $this->setAccountNumberPrefix($iban->getAccountNumberPrefix()),
                 IbanFormat::KEY_BIC_BANK_CODE => $this->setBicBankCode($iban->getBicBankCode()),
                 IbanFormat::KEY_BRANCH_CODE => $this->setBranchCode($iban->getBranchCode()),
                 IbanFormat::KEY_ACCOUNT_TYPE => $this->setAccountType($iban->getAccountType()),
@@ -302,6 +306,25 @@ final class Account
     public function setOwnerAccountNumber(?string $ownerAccountNumber): self
     {
         $this->ownerAccountNumber = $ownerAccountNumber;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getAccountNumberPrefix(): ?string
+    {
+        return $this->accountNumberPrefix;
+    }
+
+    /**
+     * @param string|null $accountNumberPrefix
+     * @return self
+     */
+    public function setAccountNumberPrefix(?string $accountNumberPrefix): self
+    {
+        $this->accountNumberPrefix = $accountNumberPrefix;
 
         return $this;
     }

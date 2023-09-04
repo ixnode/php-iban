@@ -65,6 +65,11 @@ final readonly class IbanFormat
     final public const CODE_OWNER_ACCOUNT_NUMBER = 'n';
 
 
+    /* Account number prefix: p */
+    final public const KEY_ACCOUNT_NUMBER_PREFIX = 'account-number-prefix';
+    final public const CODE_ACCOUNT_NUMBER_PREFIX = 'p';
+
+
     /* BIC bank code: q */
     final public const KEY_BIC_BANK_CODE = 'bic-bank-code';
     final public const CODE_BIC_BANK_CODE = 'q';
@@ -157,6 +162,7 @@ final readonly class IbanFormat
             self::CODE_IBAN_CHECK_DIGITS => self::KEY_IBAN_CHECK_DIGITS,
             self::CODE_CURRENCY_CODE => self::KEY_CURRENCY_CODE,
             self::CODE_OWNER_ACCOUNT_NUMBER => self::KEY_OWNER_ACCOUNT_NUMBER,
+            self::CODE_ACCOUNT_NUMBER_PREFIX => self::KEY_ACCOUNT_NUMBER_PREFIX,
             self::CODE_BIC_BANK_CODE => self::KEY_BIC_BANK_CODE,
             self::CODE_BRANCH_CODE => self::KEY_BRANCH_CODE,
             self::CODE_ACCOUNT_TYPE => self::KEY_ACCOUNT_TYPE,
@@ -198,6 +204,7 @@ final readonly class IbanFormat
             IbanFormat::KEY_NATIONAL_IDENTIFICATION_NUMBER,
             IbanFormat::KEY_CURRENCY_CODE,
             IbanFormat::KEY_OWNER_ACCOUNT_NUMBER,
+            IbanFormat::KEY_ACCOUNT_NUMBER_PREFIX,
             IbanFormat::KEY_BIC_BANK_CODE,
             IbanFormat::KEY_BRANCH_CODE,
             IbanFormat::KEY_ACCOUNT_TYPE,
@@ -300,6 +307,7 @@ final readonly class IbanFormat
                 IbanFormat::CODE_NATIONAL_IDENTIFICATION_NUMBER => $account->getNationalIdentificationNumber(),
                 IbanFormat::CODE_CURRENCY_CODE => $account->getCurrencyCode(),
                 IbanFormat::CODE_OWNER_ACCOUNT_NUMBER => $account->getOwnerAccountNumber(),
+                IbanFormat::CODE_ACCOUNT_NUMBER_PREFIX => $account->getAccountNumberPrefix(),
                 IbanFormat::CODE_BIC_BANK_CODE => $account->getBicBankCode(),
                 IbanFormat::CODE_BRANCH_CODE => $account->getBranchCode(),
                 IbanFormat::CODE_ACCOUNT_TYPE => $account->getAccountType(),

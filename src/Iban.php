@@ -34,6 +34,7 @@ final class Iban
         IbanFormat::CODE_IBAN_CHECK_DIGITS,
         IbanFormat::CODE_CURRENCY_CODE,
         IbanFormat::CODE_OWNER_ACCOUNT_NUMBER,
+        IbanFormat::CODE_ACCOUNT_NUMBER_PREFIX,
         IbanFormat::CODE_BIC_BANK_CODE,
         IbanFormat::CODE_BRANCH_CODE,
         IbanFormat::CODE_ACCOUNT_TYPE,
@@ -61,6 +62,8 @@ final class Iban
     private string|null $currencyCode = null;
 
     private string|null $ownerAccountNumber = null;
+
+    private string|null $accountNumberPrefix = null;
 
     private string|null $bicBankCode = null;
 
@@ -135,6 +138,7 @@ final class Iban
                 IbanFormat::CODE_IBAN_CHECK_DIGITS => $this->ibanCheckDigits = $this->extractInformation($countryCode, IbanFormat::CODE_IBAN_CHECK_DIGITS),
                 IbanFormat::CODE_CURRENCY_CODE => $this->currencyCode = $this->extractInformation($countryCode, IbanFormat::CODE_CURRENCY_CODE),
                 IbanFormat::CODE_OWNER_ACCOUNT_NUMBER => $this->ownerAccountNumber = $this->extractInformation($countryCode, IbanFormat::CODE_OWNER_ACCOUNT_NUMBER),
+                IbanFormat::CODE_ACCOUNT_NUMBER_PREFIX => $this->accountNumberPrefix = $this->extractInformation($countryCode, IbanFormat::CODE_ACCOUNT_NUMBER_PREFIX),
                 IbanFormat::CODE_BIC_BANK_CODE => $this->bicBankCode = $this->extractInformation($countryCode, IbanFormat::CODE_BIC_BANK_CODE),
                 IbanFormat::CODE_BRANCH_CODE => $this->branchCode = $this->extractInformation($countryCode, IbanFormat::CODE_BRANCH_CODE),
                 IbanFormat::CODE_ACCOUNT_TYPE => $this->accountType = $this->extractInformation($countryCode, IbanFormat::CODE_ACCOUNT_TYPE),
@@ -348,6 +352,14 @@ final class Iban
     public function getOwnerAccountNumber(): ?string
     {
         return $this->ownerAccountNumber;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getAccountNumberPrefix(): ?string
+    {
+        return $this->accountNumberPrefix;
     }
 
     /**
