@@ -28,6 +28,7 @@ use Ixnode\PhpIban\Exception\IbanParseException;
 final class Iban
 {
     private const SUPPORTED_CODES = [
+        IbanFormat::CODE_BALANCE_ACCOUNT_NUMBER,
         IbanFormat::CODE_NATIONAL_BANK_CODE,
         IbanFormat::CODE_ACCOUNT_NUMBER,
         IbanFormat::CODE_NATIONAL_IDENTIFICATION_NUMBER,
