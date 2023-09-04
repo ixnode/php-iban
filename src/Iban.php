@@ -31,6 +31,7 @@ final class Iban
         IbanFormat::CODE_NATIONAL_BANK_CODE,
         IbanFormat::CODE_ACCOUNT_NUMBER,
         IbanFormat::CODE_IBAN_CHECK_DIGITS,
+        IbanFormat::CODE_CURRENCY_CODE,
         IbanFormat::CODE_OWNER_ACCOUNT_NUMBER,
         IbanFormat::CODE_BRANCH_CODE,
         IbanFormat::CODE_ACCOUNT_TYPE,
