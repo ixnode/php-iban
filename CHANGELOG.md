@@ -7,9 +7,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.1.16] - 2023-09-04
+
+* Add more IBAN countries and tests
+* Add currency-code
+
 ### [0.1.15] - 2023-09-04
 
 * Add more IBAN countries and tests
+* Add owner-account-number and account-type
 
 ### [0.1.14] - 2023-09-03
 
