@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.1.23] - 2023-09-07
+
+* Add IBAN parts method
+
 ### [0.1.22] - 2023-09-05
 
 * Add more IBAN countries and tests
