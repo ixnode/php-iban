@@ -190,31 +190,46 @@ vendor/bin/php-iban -V
 > Used to quickly check a given IBAN number.
 
 ```bash
-bin/console iban:validate DE02120300000000202051
+bin/console iban:validate MU17BOMM0101101030300200000MUR
 ```
 
 or within your composer project:
 
 ```bash
-bin/console iban:validate FR7630027175330002005370159
+bin/console iban:validate MU17BOMM0101101030300200000MUR
 ```
 
 ```bash
 
-Given IBAN:     FR7630027175330002005370159
+Given IBAN:     MU17BOMM0101101030300200000MUR
 
 Parsed IBAN
 -----------
-IBAN:                   FR7630027175330002005370159
-IBAN (formatted):       FR76 3002 7175 3300 0200 5370 159
-Valid:                  YES
-Last error:             N/A
-Country:                FR (France)
-Checksum:               76
-National bank code:     30027
-Branch code:            17533
-Account number:         00020053701
-National check digits:  59
+Valid:                           YES
+Last error:                      N/A
+IBAN:                            MU17BOMM0101101030300200000MUR
+IBAN:                            MU17 BOMM 0101 1010 3030 0200 000M UR
+Checksum:                        17
+Format:                          MUkkbbbbbbsscccccccccccc000mmm
+Parts:                           country-code=MU, iban-check-digits=17, national-bank-code=BOMM01, branch-code=01, account-number=101030300200, number=000, currency-code=MUR
+
+Account
+-------
+Country:                         MU (Mauritius)
+Checksum:                        17
+Balance cccount number:          N/A
+National bank code:              BOMM01
+Account number:                  101030300200
+National identification number:  N/A
+Currency code:                   MUR
+Owner account number:            N/A
+Account number prefix:           N/A
+Bic bank code:                   N/A
+Branch code:                     01
+Account type:                    N/A
+National check digits:           N/A
+IBAN (from account):             MU17BOMM0101101030300200000MUR
+IBAN (from account):             MU17 BOMM 0101 1010 3030 0200 000M U
 
 ```
 
