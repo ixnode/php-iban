@@ -24,6 +24,8 @@ use Ixnode\PhpIban\Exception\IbanParseException;
  * @version 0.1.0 (2023-09-01)
  * @since 0.1.0 (2023-09-01) First version.
  * @SuppressWarnings(PHPMD.LongVariable)
+ * @SuppressWarnings(PHPMD.TooManyFields)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 final class Iban
 {
@@ -46,6 +48,9 @@ final class Iban
     private string|null $lastError = null;
 
     private bool $valid = false;
+
+    /** @var array<string, string> $parts */
+    private array $parts = [];
 
     private string|null $countryCode = null;
 
@@ -98,6 +103,7 @@ final class Iban
      * @throws IbanParseException
      * @SuppressWarnings(PHPMD.NPathComplexity)
      * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     private function parseIban(): bool
     {
@@ -111,7 +117,7 @@ final class Iban
             return false;
         }
 
-        $ibanFormat = $this->getIbanFormat($countryCode);
+        $ibanFormat = $this->getIbanFormatString($countryCode);
         $checkFormat = $this->checkIbanFormat($ibanFormat);
 
         if ($checkFormat !== '') {
@@ -128,23 +134,106 @@ final class Iban
             return false;
         }
 
+        $this->parts = [];
+        $this->parts[IbanFormat::KEY_COUNTRY_CODE] = $countryCode;
+
         $this->countryCode = $countryCode;
 
-        foreach ((new IbanFormat($countryCode))->getIbanFormatCodes() as $format) {
-            match ($format) {
-                IbanFormat::CODE_BALANCE_ACCOUNT_NUMBER => $this->balanceAccountNumber = $this->extractInformation($countryCode, IbanFormat::CODE_BALANCE_ACCOUNT_NUMBER),
-                IbanFormat::CODE_NATIONAL_BANK_CODE => $this->nationalBankCode = $this->extractInformation($countryCode, IbanFormat::CODE_NATIONAL_BANK_CODE),
-                IbanFormat::CODE_ACCOUNT_NUMBER => $this->accountNumber = $this->extractInformation($countryCode, IbanFormat::CODE_ACCOUNT_NUMBER),
-                IbanFormat::CODE_NATIONAL_IDENTIFICATION_NUMBER => $this->nationalIdentificationNumber = $this->extractInformation($countryCode, IbanFormat::CODE_NATIONAL_IDENTIFICATION_NUMBER),
-                IbanFormat::CODE_IBAN_CHECK_DIGITS => $this->ibanCheckDigits = $this->extractInformation($countryCode, IbanFormat::CODE_IBAN_CHECK_DIGITS),
-                IbanFormat::CODE_CURRENCY_CODE => $this->currencyCode = $this->extractInformation($countryCode, IbanFormat::CODE_CURRENCY_CODE),
-                IbanFormat::CODE_OWNER_ACCOUNT_NUMBER => $this->ownerAccountNumber = $this->extractInformation($countryCode, IbanFormat::CODE_OWNER_ACCOUNT_NUMBER),
-                IbanFormat::CODE_ACCOUNT_NUMBER_PREFIX => $this->accountNumberPrefix = $this->extractInformation($countryCode, IbanFormat::CODE_ACCOUNT_NUMBER_PREFIX),
-                IbanFormat::CODE_BIC_BANK_CODE => $this->bicBankCode = $this->extractInformation($countryCode, IbanFormat::CODE_BIC_BANK_CODE),
-                IbanFormat::CODE_BRANCH_CODE => $this->branchCode = $this->extractInformation($countryCode, IbanFormat::CODE_BRANCH_CODE),
-                IbanFormat::CODE_ACCOUNT_TYPE => $this->accountType = $this->extractInformation($countryCode, IbanFormat::CODE_ACCOUNT_TYPE),
-                IbanFormat::CODE_NATIONAL_CHECK_DIGITS => $this->nationalCheckDigits = $this->extractInformation($countryCode, IbanFormat::CODE_NATIONAL_CHECK_DIGITS),
-                default => throw new IbanParseException(sprintf('The given format "%s" is not supported yet.', $format)),
+        foreach ((new IbanFormat($countryCode))->getIbanFormatCodes(withZero: true) as $format) {
+            switch ($format) {
+                case IbanFormat::CODE_BALANCE_ACCOUNT_NUMBER:
+                    $this->balanceAccountNumber = $this->extractInformation($countryCode, IbanFormat::CODE_BALANCE_ACCOUNT_NUMBER);
+                    if (!is_null($this->balanceAccountNumber)) {
+                        $this->parts[IbanFormat::KEY_BALANCE_ACCOUNT_NUMBER] = $this->balanceAccountNumber;
+                    }
+                    break;
+
+                case IbanFormat::CODE_NATIONAL_BANK_CODE:
+                    $this->nationalBankCode = $this->extractInformation($countryCode, IbanFormat::CODE_NATIONAL_BANK_CODE);
+                    if (!is_null($this->nationalBankCode)) {
+                        $this->parts[IbanFormat::KEY_NATIONAL_BANK_CODE] = $this->nationalBankCode;
+                    }
+                    break;
+
+                case IbanFormat::CODE_ACCOUNT_NUMBER:
+                    $this->accountNumber = $this->extractInformation($countryCode, IbanFormat::CODE_ACCOUNT_NUMBER);
+                    if (!is_null($this->accountNumber)) {
+                        $this->parts[IbanFormat::KEY_ACCOUNT_NUMBER] = $this->accountNumber;
+                    }
+                    break;
+
+                case IbanFormat::CODE_NATIONAL_IDENTIFICATION_NUMBER:
+                    $this->nationalIdentificationNumber = $this->extractInformation($countryCode, IbanFormat::CODE_NATIONAL_IDENTIFICATION_NUMBER);
+                    if (!is_null($this->nationalIdentificationNumber)) {
+                        $this->parts[IbanFormat::KEY_NATIONAL_IDENTIFICATION_NUMBER] = $this->nationalIdentificationNumber;
+                    }
+                    break;
+
+                case IbanFormat::CODE_IBAN_CHECK_DIGITS:
+                    $this->ibanCheckDigits = $this->extractInformation($countryCode, IbanFormat::CODE_IBAN_CHECK_DIGITS);
+                    if (!is_null($this->ibanCheckDigits)) {
+                        $this->parts[IbanFormat::KEY_IBAN_CHECK_DIGITS] = $this->ibanCheckDigits;
+                    }
+                    break;
+
+                case IbanFormat::CODE_CURRENCY_CODE:
+                    $this->currencyCode = $this->extractInformation($countryCode, IbanFormat::CODE_CURRENCY_CODE);
+                    if (!is_null($this->currencyCode)) {
+                        $this->parts[IbanFormat::KEY_CURRENCY_CODE] = $this->currencyCode;
+                    }
+                    break;
+
+                case IbanFormat::CODE_OWNER_ACCOUNT_NUMBER:
+                    $this->ownerAccountNumber = $this->extractInformation($countryCode, IbanFormat::CODE_OWNER_ACCOUNT_NUMBER);
+                    if (!is_null($this->ownerAccountNumber)) {
+                        $this->parts[IbanFormat::KEY_OWNER_ACCOUNT_NUMBER] = $this->ownerAccountNumber;
+                    }
+                    break;
+
+                case IbanFormat::CODE_ACCOUNT_NUMBER_PREFIX:
+                    $this->accountNumberPrefix = $this->extractInformation($countryCode, IbanFormat::CODE_ACCOUNT_NUMBER_PREFIX);
+                    if (!is_null($this->accountNumberPrefix)) {
+                        $this->parts[IbanFormat::KEY_ACCOUNT_NUMBER_PREFIX] = $this->accountNumberPrefix;
+                    }
+                    break;
+
+                case IbanFormat::CODE_BIC_BANK_CODE:
+                    $this->bicBankCode = $this->extractInformation($countryCode, IbanFormat::CODE_BIC_BANK_CODE);
+                    if (!is_null($this->bicBankCode)) {
+                        $this->parts[IbanFormat::KEY_BIC_BANK_CODE] = $this->bicBankCode;
+                    }
+                    break;
+
+                case IbanFormat::CODE_BRANCH_CODE:
+                    $this->branchCode = $this->extractInformation($countryCode, IbanFormat::CODE_BRANCH_CODE);
+                    if (!is_null($this->branchCode)) {
+                        $this->parts[IbanFormat::KEY_BRANCH_CODE] = $this->branchCode;
+                    }
+                    break;
+
+                case IbanFormat::CODE_ACCOUNT_TYPE:
+                    $this->accountType = $this->extractInformation($countryCode, IbanFormat::CODE_ACCOUNT_TYPE);
+                    if (!is_null($this->accountType)) {
+                        $this->parts[IbanFormat::KEY_ACCOUNT_TYPE] = $this->accountType;
+                    }
+                    break;
+
+                case IbanFormat::CODE_NATIONAL_CHECK_DIGITS:
+                    $this->nationalCheckDigits = $this->extractInformation($countryCode, IbanFormat::CODE_NATIONAL_CHECK_DIGITS);
+                    if (!is_null($this->nationalCheckDigits)) {
+                        $this->parts[IbanFormat::KEY_NATIONAL_CHECK_DIGITS] = $this->nationalCheckDigits;
+                    }
+                    break;
+
+                case IbanFormat::ALWAYS_ZERO:
+                    $number = $this->extractInformation($countryCode, IbanFormat::ALWAYS_ZERO);
+                    if (!is_null($number)) {
+                        $this->parts['number'] = $number;
+                    }
+                    break;
+
+                default:
+                    throw new IbanParseException(sprintf('The given format "%s" is not supported yet.', $format));
             };
         }
 
@@ -172,13 +261,23 @@ final class Iban
     }
 
     /**
+     * Returns the IBAN parts.
+     *
+     * @return array<string, string>
+     */
+    public function getParts(): array
+    {
+        return $this->parts;
+    }
+
+    /**
      * Returns the IBAN format without spaces by given country.
      *
      * @param string $country
      * @return string
      * @throws IbanParseException
      */
-    private function getIbanFormat(string $country): string
+    private function getIbanFormatString(string $country): string
     {
         if (!array_key_exists($country, IbanFormats::IBAN_FORMATS)) {
             throw new IbanParseException(sprintf('The given country "%s" is not supported yet.', $country));
@@ -222,7 +321,7 @@ final class Iban
      */
     private function extractInformation(string $countryCode, string $code): string|null
     {
-        $ibanFormat = $this->getIbanFormat($countryCode);
+        $ibanFormat = $this->getIbanFormatString($countryCode);
         $checkFormat = $this->checkIbanFormat($ibanFormat);
 
         if ($checkFormat !== '') {
@@ -239,6 +338,20 @@ final class Iban
         preg_match(sprintf('~[%s]+~', $code), $ibanFormat, $matches);
 
         return substr($this->iban, $position, strlen((string) $matches[0]));
+    }
+
+    /**
+     * Returns the IbanFormat object or null.
+     *
+     * @return IbanFormat|null
+     */
+    public function getIbanFormat(): ?IbanFormat
+    {
+        if (is_null($this->countryCode)) {
+            return null;
+        }
+
+        return new IbanFormat($this->countryCode);
     }
 
     /**

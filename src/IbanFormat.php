@@ -127,12 +127,13 @@ final readonly class IbanFormat
      * Returns the IBAN format codes.
      *
      * @param bool $withoutIbanCheckDigits
+     * @param bool $withZero
      * @return array<int, string>
      * @throws IbanParseException
      * @SuppressWarnings(PHPMD.BooleanArgumentFlag)
      * @SuppressWarnings(PHPMD.LongVariable)
      */
-    public function getIbanFormatCodes(bool $withoutIbanCheckDigits = false): array
+    public function getIbanFormatCodes(bool $withoutIbanCheckDigits = false, bool $withZero = false): array
     {
         $ibanFormat = $this->getIbanFormat();
 
@@ -142,7 +143,7 @@ final readonly class IbanFormat
 
         $ibanFormatCodesWithZero = array_values(array_unique($characters));
 
-        return array_diff($ibanFormatCodesWithZero, [self::ALWAYS_ZERO]);
+        return array_values(array_diff($ibanFormatCodesWithZero, $withZero ? [] : [self::ALWAYS_ZERO]));
     }
 
     /**

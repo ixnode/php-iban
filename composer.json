@@ -26,10 +26,10 @@
     "ext-bcmath": "*",
     "ext-curl": "*",
     "ext-gd": "*",
-    "ixnode/php-exception": "^0.1.21",
+    "ixnode/php-exception": "^0.1",
     "adhocore/cli": "^v1.0.0",
-    "ixnode/php-cli-image": "^0.1.1",
-    "ixnode/php-timezone": "^0.1.18"
+    "ixnode/php-cli-image": "^0.1",
+    "ixnode/php-timezone": "^0.1"
   },
   "require-dev": {
     "phpunit/phpunit": "^9.5",
@@ -37,7 +37,7 @@
     "rector/rector": "^0.15.1",
     "phpmd/phpmd": "^2.13",
     "friendsofphp/php-cs-fixer": "^3.13",
-    "ixnode/bash-version-manager": "^0.1.3",
+    "ixnode/bash-version-manager": "^0.1",
     "povils/phpmnd": "^3.0",
     "jetbrains/phpstorm-attributes": "^1.0"
   },

@@ -81,6 +81,8 @@ abstract class BaseCommand extends Command
         $this->writeln(sprintf('IBAN:                            %s', $iban->getIban()));
         $this->writeln(sprintf('IBAN:                            %s', $iban->getIbanFormatted()));
         $this->writeln(sprintf('Checksum:                        %s', $iban->getIbanCheckDigits()));
+        $this->writeln(sprintf('Format:                          %s', $iban->getIbanFormat()?->getIbanFormat() ?: 'N/A'));
+        $this->writeln(sprintf('Parts:                           %s', http_build_query($iban->getParts(),'',', ')));
 
         $this->writeln('');
         $this->writeln('Account');
