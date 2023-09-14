@@ -26,6 +26,7 @@ use Ixnode\PhpTimezone\Constants\Locale;
  * @version 0.1.0 (2023-09-01)
  * @since 0.1.0 (2023-09-01) First version.
  * @SuppressWarnings(PHPMD.LongVariable)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 final class Account
 {
@@ -46,6 +47,8 @@ final class Account
     private string|null $accountType = null;
 
     private string|null $nationalCheckDigits = null;
+
+    private string|null $lastError = null;
 
     /**
      * @param string $accountNumber
@@ -434,7 +437,15 @@ final class Account
      */
     public function getIban(): string|null
     {
-        return (new IbanFormat($this->countryCode))->getIban($this);
+        $ibanFormat = new IbanFormat($this->countryCode);
+
+        $iban = $ibanFormat->getIban($this);
+
+        if ($ibanFormat->hasLastError()) {
+            $this->setLastError($ibanFormat->getLastError());
+        }
+
+        return $iban;
     }
 
     /**
@@ -464,6 +475,60 @@ final class Account
      */
     private function getIbanRaw(): string|null
     {
-        return (new IbanFormat($this->countryCode))->getIbanRaw($this);
+        $ibanFormat = new IbanFormat($this->countryCode);
+
+        $ibanRaw = $ibanFormat->getIbanRaw($this);
+
+        if ($ibanFormat->hasLastError()) {
+            $this->setLastError($ibanFormat->getLastError());
+        }
+
+        return $ibanRaw;
+    }
+
+    /**
+     * Sets the last error message.
+     *
+     * @param string $lastError
+     * @return void
+     */
+    private function setLastError(string $lastError): void
+    {
+        $this->lastError = $lastError;
+    }
+
+    /**
+     * Returns the last error.
+     *
+     * @return string
+     * @throws IbanParseException
+     */
+    public function getLastError(): string
+    {
+        if (is_null($this->lastError)) {
+            throw new IbanParseException('There is no last error set.');
+        }
+
+        return $this->lastError;
+    }
+
+    /**
+     * Returns whether the last error is set.
+     *
+     * @return bool
+     */
+    public function hasLastError(): bool
+    {
+        return !is_null($this->lastError);
+    }
+
+    /**
+     * Alias of hasLastError().
+     *
+     * @return bool
+     */
+    public function isValid(): bool
+    {
+        return $this->hasLastError();
     }
 }
