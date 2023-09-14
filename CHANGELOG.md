@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.1.27] - 2023-09-14
+
+* Fix direction of isValid (Account, IbanFormat)
+
 ### [0.1.26] - 2023-09-14
 
 * Pass last error from IbanFormat to Account
