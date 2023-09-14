@@ -414,7 +414,13 @@ final class Account
      */
     public function getIbanCheckDigits(): string
     {
-        $checksum = intval(bcmod($this->getIbanRaw(), '97'));
+        $ibanRaw = $this->getIbanRaw();
+
+        if (is_null($ibanRaw)) {
+            throw new AccountParseException('Unable to create IBAN.');
+        }
+
+        $checksum = intval(bcmod($ibanRaw, '97'));
 
         return str_pad(strval(98 - $checksum), 2, '0', STR_PAD_LEFT);
     }
@@ -422,11 +428,11 @@ final class Account
     /**
      * Returns the calculated iban number.
      *
-     * @return string
+     * @return string|null
      * @throws AccountParseException
      * @throws IbanParseException
      */
-    public function getIban(): string
+    public function getIban(): string|null
     {
         return (new IbanFormat($this->countryCode))->getIban($this);
     }
@@ -434,23 +440,29 @@ final class Account
     /**
      * Returns the formatted IBAN number.
      *
-     * @return string
+     * @return string|null
      * @throws AccountParseException
      * @throws IbanParseException
      */
-    public function getIbanFormatted(): string
+    public function getIbanFormatted(): string|null
     {
-        return trim(chunk_split($this->getIban(), 4, ' '));
+        $iban = $this->getIban();
+
+        if (is_null($iban)) {
+            return null;
+        }
+
+        return trim(chunk_split($iban, 4, ' '));
     }
 
     /**
      * Returns the raw iban code with fake checksum to calculate the IBAN check digits.
      *
-     * @return string
+     * @return string|null
      * @throws AccountParseException
      * @throws IbanParseException
      */
-    private function getIbanRaw(): string
+    private function getIbanRaw(): string|null
     {
         return (new IbanFormat($this->countryCode))->getIbanRaw($this);
     }

@@ -24,7 +24,7 @@ use Ixnode\PhpIban\Exception\IbanParseException;
  * @version 0.1.0 (2023-09-02)
  * @since 0.1.0 (2023-09-02) First version.
  */
-final readonly class IbanFormat
+final class IbanFormat
 {
     /* AT, CH, DE, etc. */
     final public const KEY_COUNTRY_CODE = 'country-code';
@@ -100,11 +100,13 @@ final readonly class IbanFormat
 
     protected const EMPTY_CHECK_DIGITS = '00';
 
+    protected string|null $lastError = null;
+
 
     /**
      * @param string $countryCode
      */
-    public function __construct(private string $countryCode)
+    public function __construct(private readonly string $countryCode)
     {
     }
 
@@ -249,11 +251,11 @@ final readonly class IbanFormat
      * Builds an IBAN from given Account object.
      *
      * @param Account $account
-     * @return string
-     * @throws Exception\AccountParseException
+     * @return string|null
+     * @throws AccountParseException
      * @throws IbanParseException
      */
-    public function getIban(Account $account): string
+    public function getIban(Account $account): string|null
     {
         $ibanFormatCodes = $this->getIbanFormatCodes();
 
@@ -266,11 +268,11 @@ final readonly class IbanFormat
      * Builds an IBAN from given Account object.
      *
      * @param Account $account
-     * @return string
+     * @return string|null
      * @throws AccountParseException
      * @throws IbanParseException
      */
-    public function getIbanRaw(Account $account): string
+    public function getIbanRaw(Account $account): string|null
     {
         $ibanFormatCodes = $this->getIbanFormatCodes(true);
 
@@ -278,7 +280,13 @@ final readonly class IbanFormat
 
         $iban = substr($iban, 4).$this->countryCode.self::EMPTY_CHECK_DIGITS;
 
-        return $this->calculateCodeNumber($this->translateIbanFormat($account, $ibanFormatCodes, $iban));
+        $translateIbanFormat = $this->translateIbanFormat($account, $ibanFormatCodes, $iban);
+
+        if (is_null($translateIbanFormat)) {
+            return null;
+        }
+
+        return $this->calculateCodeNumber($translateIbanFormat);
     }
 
     /**
@@ -287,14 +295,16 @@ final readonly class IbanFormat
      * @param Account $account
      * @param array<int, string> $ibanFormatCodes
      * @param string $ibanFormat
-     * @return string
+     * @return string|null
      * @throws AccountParseException
      * @throws IbanParseException
      */
-    private function translateIbanFormat(Account $account, array $ibanFormatCodes, string $ibanFormat): string
+    private function translateIbanFormat(Account $account, array $ibanFormatCodes, string $ibanFormat): string|null
     {
+        $ibanFormatParsed = $ibanFormat;
+
         foreach ($ibanFormatCodes as $ibanFormatCode) {
-            $count = substr_count($ibanFormat, $ibanFormatCode);
+            $count = substr_count($ibanFormatParsed, $ibanFormatCode);
 
             if ($count <= 0) {
                 continue;
@@ -317,18 +327,66 @@ final readonly class IbanFormat
             };
 
             if (is_null($value)) {
-                throw new IbanParseException('Missing properties within the Account object to create a valid IBAN.');
+                $this->setLastError(sprintf('Unsupported property within the Account object given: "%s".', $ibanFormat));
+                return null;
             }
 
             if (strlen($value) > $count) {
-                throw new IbanParseException(sprintf('The given checksum "%s" is too long.', $value));
+                $this->setLastError(sprintf('The given value "%s" is too long (%s: %s).', $value, $ibanFormatCode, $ibanFormat));
+                return null;
             }
 
             $value = str_pad($value, $count, '0', STR_PAD_LEFT);
 
-            $ibanFormat = str_replace(str_repeat($ibanFormatCode, $count), $value, $ibanFormat);
+            $ibanFormatParsed = str_replace(str_repeat($ibanFormatCode, $count), $value, $ibanFormatParsed);
         }
 
-        return $ibanFormat;
+        return $ibanFormatParsed;
+    }
+
+    /**
+     * Sets the last error message.
+     *
+     * @param string $lastError
+     * @return void
+     */
+    private function setLastError(string $lastError): void
+    {
+        $this->lastError = $lastError;
+    }
+
+    /**
+     * Returns the last error.
+     *
+     * @return string
+     * @throws IbanParseException
+     */
+    public function getLastError(): string
+    {
+        if (is_null($this->lastError)) {
+            throw new IbanParseException('There is no last error set.');
+        }
+
+        return $this->lastError;
+    }
+
+    /**
+     * Returns whether the last error is set.
+     *
+     * @return bool
+     */
+    public function hasLastError(): bool
+    {
+        return !is_null($this->lastError);
+    }
+
+    /**
+     * Alias of hasLastError().
+     *
+     * @return bool
+     */
+    public function isValid(): bool
+    {
+        return $this->hasLastError();
     }
 }

@@ -102,7 +102,7 @@ abstract class BaseCommand extends Command
         $this->writeln(sprintf('Account type:                    %s', $account?->getAccountType() ?: 'N/A'));
         $this->writeln(sprintf('National check digits:           %s', $account?->getNationalCheckDigits() ?: 'N/A'));
 
-        $this->writeln(sprintf('IBAN (from account):             %s', $account?->getIban()));
+        $this->writeln(sprintf('IBAN (from account):             %s', $account?->getIban() ?: 'N/A'));
         $this->writeln(sprintf('IBAN (from account):             %s', $account?->getIbanFormatted()));
         $this->writeln('');
     }

@@ -60,7 +60,13 @@ class Validator
 
             case $given instanceof Account:
                 $this->account = $given;
-                $this->iban = new Iban($this->account->getIban());
+                $iban = $this->account->getIban();
+
+                if (is_null($iban)) {
+                    throw new CaseUnsupportedException('Unable to create an IBAN from an account.');
+                }
+
+                $this->iban = new Iban($iban);
                 break;
 
             default:
