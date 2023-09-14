@@ -327,7 +327,10 @@ final class IbanFormat
             };
 
             if (is_null($value)) {
-                $this->setLastError(sprintf('Unsupported property within the Account object given: "%s".', $ibanFormat));
+                match (true) {
+                    $account->hasLastError() => $this->setLastError($account->getLastError()),
+                    default => $this->setLastError(sprintf('Unsupported property within the Account object given: "%s".', $ibanFormatCode)),
+                };
                 return null;
             }
 

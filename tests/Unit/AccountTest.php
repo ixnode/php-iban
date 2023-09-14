@@ -39,7 +39,8 @@ final class AccountTest extends TestCase
      * @param string $accountNumber
      * @param string $nationalBankCode
      * @param string $countryCode
-     * @param string $expectedIban
+     * @param string|null $expectedIban
+     * @param string|null $lastError
      * @throws AccountParseException
      * @throws IbanParseException
      */
@@ -48,17 +49,24 @@ final class AccountTest extends TestCase
         string $accountNumber,
         string $nationalBankCode,
         string $countryCode,
-        string $expectedIban,
+        string|null $expectedIban,
+        string|null $lastError = null
     ): void
     {
         /* Arrange */
 
         /* Act */
-        $validator = new Account($accountNumber, $nationalBankCode, $countryCode);
+        $account = new Account($accountNumber, $nationalBankCode, $countryCode);
+        $iban = $account->getIban();
 
         /* Assert */
         $this->assertIsNumeric($number); // To avoid phpmd warning.
-        $this->assertSame($validator->getIban(), $expectedIban);
+        $this->assertSame(is_null($lastError), $account->isValid());
+        $this->assertSame($expectedIban, $iban);
+
+        if (!is_null($lastError)) {
+            $this->assertSame($lastError, $account->getLastError());
+        }
     }
 
     /**
@@ -73,7 +81,7 @@ final class AccountTest extends TestCase
         return [
 
             /**
-             * DACH + LI Accounts (without leading zeros).
+             * Valid tests: DACH + LI Accounts (without leading zeros).
              */
             [++$number, '1349870', '60000', 'AT', 'AT026000000001349870', ],
             [++$number, '100013997', '09000', 'CH', 'CH0209000000100013997', ],
@@ -81,12 +89,20 @@ final class AccountTest extends TestCase
             [++$number, '17197386', '08800', 'LI', 'LI0208800000017197386', ],
 
             /**
-             * DACH + LI Accounts (with leading zeros).
+             * Valid tests: DACH + LI Accounts (with leading zeros).
              */
             [++$number, '00001349870', '60000', 'AT', 'AT026000000001349870', ],
             [++$number, '000100013997', '09000', 'CH', 'CH0209000000100013997', ],
             [++$number, '0000202051', '12030000', 'DE', 'DE02120300000000202051', ],
             [++$number, '000017197386', '08800', 'LI', 'LI0208800000017197386', ],
+
+            /**
+             * Invalid tests (True negative): Account number to long.
+             */
+            [++$number, '0000001349870', '60000', 'AT', null, 'The given value "0000001349870" is too long (c: bbbbbcccccccccccAT00).', ],
+            [++$number, '00000100013997', '09000', 'CH', null, 'The given value "00000100013997" is too long (c: bbbbbccccccccccccCH00).', ],
+            [++$number, '000000202051', '12030000', 'DE', null, 'The given value "000000202051" is too long (c: bbbbbbbbccccccccccDE00).', ],
+            [++$number, '00000017197386', '08800', 'LI', null, 'The given value "00000017197386" is too long (c: bbbbbccccccccccccLI00).', ],
         ];
     }
 }
