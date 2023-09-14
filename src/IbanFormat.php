@@ -387,6 +387,6 @@ final class IbanFormat
      */
     public function isValid(): bool
     {
-        return $this->hasLastError();
+        return !$this->hasLastError();
     }
 }
