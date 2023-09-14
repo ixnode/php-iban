@@ -411,16 +411,16 @@ final class Account
     /**
      * Returns the IBAN check digits of the account number and bank code.
      *
-     * @return string
+     * @return string|null
      * @throws AccountParseException
      * @throws IbanParseException
      */
-    public function getIbanCheckDigits(): string
+    public function getIbanCheckDigits(): string|null
     {
         $ibanRaw = $this->getIbanRaw();
 
         if (is_null($ibanRaw)) {
-            throw new AccountParseException('Unable to create IBAN.');
+            return null;
         }
 
         $checksum = intval(bcmod($ibanRaw, '97'));
