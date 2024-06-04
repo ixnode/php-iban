@@ -175,6 +175,7 @@ final class Account
                 IbanFormat::KEY_NATIONAL_IDENTIFICATION_NUMBER => $this->setNationalIdentificationNumber($value),
                 IbanFormat::KEY_CURRENCY_CODE => $this->setCurrencyCode($value),
                 IbanFormat::KEY_OWNER_ACCOUNT_NUMBER => $this->setOwnerAccountNumber($value),
+                IbanFormat::KEY_ACCOUNT_NUMBER_PREFIX => $this->setAccountNumberPrefix($value),
                 IbanFormat::KEY_BIC_BANK_CODE => $this->setBicBankCode($value),
                 IbanFormat::KEY_BRANCH_CODE => $this->setBranchCode($value),
                 IbanFormat::KEY_ACCOUNT_TYPE => $this->setAccountType($value),
