@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## Releases
 
+### [0.1.30] - 2024-06-04
+
+* Add missing number prefix (`IbanFormat::KEY_ACCOUNT_NUMBER_PREFIX`) in given properties
+
 ### [0.1.29] - 2023-09-14
 
 * Add true negative tests to AccountTest
